@@ -28,28 +28,41 @@ public class Main extends Application {
     private static final String APP_TITLE = "Hello World!";
     
     private EditDataWindow editData;
+    private DurationReport duration;
+    private AssistantWindow farmReport;
     
     @Override
     public void start(Stage primaryStage) throws Exception {
         // save args example
         args = this.getParameters().getRaw();
         
-        // Main layout is Border Pane example (top,left,center,right,bottom)
+        //Initialize windows
         editData = new EditDataWindow(primaryStage);
-        BorderPane root = new BorderPane();
-
-        // Add the vertical box to the center of the root pane
-        root.setTop(new Label(APP_TITLE));
-        Button next = new Button("Edit Data");
-        next.setOnAction(actionEvent ->{
+        duration = new DurationReport(primaryStage);
+        farmReport = null;
+        
+        Button edit = new Button("Edit Data");
+        edit.setOnAction(actionEvent ->{
           editData.showWindow(primaryStage);
         });
-        root.setCenter(next);
+        
+        Button dur = new Button("Duration Report");
+        dur.setOnAction(actionEvent ->{
+          duration.showWindow(primaryStage);
+        });
+        
+        Button farm = new Button("Farm Report");
+        farm.setOnAction(actionEvent ->{
+          farmReport.showWindow(primaryStage);
+        });
+        
+        VBox root = new VBox(edit, dur, farm);
         Scene mainScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         // Add the stuff and set the primary stage
             primaryStage.setTitle(APP_TITLE);
             primaryStage.setScene(mainScene);
+            primaryStage.setResizable(false);
             primaryStage.show();
     }
 
