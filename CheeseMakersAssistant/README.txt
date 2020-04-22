@@ -7,7 +7,7 @@ Team Members:
 1. Adam Szulczewski, Lec 001, and aaszulczewsk@wisc.edu
 2. Michael Messer, Lec 001, and messer3@wisc.edu
 3. Maddie Henry, Lec 001, mmhenry2@wisc.edu
-4. member name4, lecture, and email4@wisc.edu
+4. Anson Doan, Lec 001, doan3@wisc.edu
 
  
 
