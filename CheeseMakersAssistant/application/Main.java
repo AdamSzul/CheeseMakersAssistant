@@ -1,75 +1,97 @@
 package application;
 
+import java.io.File;
 import java.util.List;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
+import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 /**
- * This class is just a main method for testing purposes.
  * 
- * @author Adam
+ * @author Michael
  *
  */
 public class Main extends Application {
-    // store any command-line arguments that were entered.
-    // NOTE: this.getParameters().getRaw() will get these also
-    private List<String> args;
+  private List<String> args;
+  
+  private static final int WINDOW_WIDTH = 600;
+  private static final int WINDOW_HEIGHT = 500;
+  private static final String APP_TITLE = "Milk Weights";
+  
+  private EditDataWindow editData;
+  private DurationReport durationReport;
+  private FarmReport farmReport;
 
-    private static final int WINDOW_WIDTH = 600;
-    private static final int WINDOW_HEIGHT = 500;
-    private static final String APP_TITLE = "Hello World!";
+  /**
+   * Start method
+   * @param primaryStage stage
+   */
+  @Override
+  public void start(Stage primaryStage) {
     
-    private EditDataWindow editData;
-    private DurationReport duration;
-    private AssistantWindow farmReport;
+    BorderPane root = new BorderPane();
+
+    editData = new EditDataWindow(primaryStage);
+    durationReport = new DurationReport(primaryStage);
+    farmReport = new FarmReport(primaryStage);
     
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        // save args example
-        args = this.getParameters().getRaw();
-        
-        //Initialize windows
-        editData = new EditDataWindow(primaryStage);
-        duration = new DurationReport(primaryStage);
-        farmReport = null;
-        
-        Button edit = new Button("Edit Data");
-        edit.setOnAction(actionEvent ->{
-          editData.showWindow(primaryStage);
-        });
-        
-        Button dur = new Button("Duration Report");
-        dur.setOnAction(actionEvent ->{
-          duration.showWindow(primaryStage);
-        });
-        
-        Button farm = new Button("Farm Report");
-        farm.setOnAction(actionEvent ->{
-          farmReport.showWindow(primaryStage);
-        });
-        
-        VBox root = new VBox(edit, dur, farm);
-        Scene mainScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+    root.setTop(new Label("Milk Weights"));
 
-        // Add the stuff and set the primary stage
-            primaryStage.setTitle(APP_TITLE);
-            primaryStage.setScene(mainScene);
-            primaryStage.setResizable(false);
-            primaryStage.show();
-    }
+    VBox vbox = new VBox();
+    
+    Button loadFromFileButton = new Button("Load from File");
+    loadFromFileButton.setOnAction(actionEvent -> {
+      FileChooser fileChooser = new FileChooser();
+      fileChooser.setTitle("Load File");
+      fileChooser.showOpenDialog(primaryStage);
+    });
+    
+    Button saveToFileButton = new Button("Save to File");
+    saveToFileButton.setOnAction(actionEvent -> {
+      FileChooser fileChooser = new FileChooser();
+      fileChooser.setTitle("Save File");
+      fileChooser.showSaveDialog(primaryStage);
+    });
+    
+    Button editDataButton = new Button("Edit Data");
+    editDataButton.setOnAction(actionEvent -> {
+      editData.showWindow(primaryStage);
+    });
+    
+    Button farmReportButton = new Button("Farm Report");
+    farmReportButton.setOnAction(actionEvent -> {
+      farmReport.showWindow(primaryStage);
+    });
+    
+    Button durationReportButton = new Button("Duration Report");
+    durationReportButton.setOnAction(actionEvent -> {
+      durationReport.showWindow(primaryStage);
+    });
+    
+    
+    vbox.getChildren().addAll(loadFromFileButton, saveToFileButton, editDataButton, farmReportButton, durationReportButton);
+    root.setCenter(vbox);
+    
+    Scene mainScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-           launch(args);
-    }
+    primaryStage.setTitle(APP_TITLE);
+    primaryStage.setScene(mainScene);
+    primaryStage.show();
+    primaryStage.setResizable(false);
+  }
+
+  /**
+   * Main method
+   * @param args args
+   */
+  public static void main(String[] args) {
+    launch(args);
+  }
 }
