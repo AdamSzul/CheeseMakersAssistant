@@ -8,10 +8,11 @@ Team Members:
 2. Michael Messer, Lec 001, and messer3@wisc.edu
 3. Maddie Henry, Lec 001, mmhenry2@wisc.edu
 4. Anson Doan, Lec 001, doan3@wisc.edu
-
+5. Anand Shatdal, Lec 001, ashatdal2@wisc.edu
  
 
 Which team members were on same xteam together?
-
+Adam Szulczewski and Anand Shatdal
 
 Other notes or comments to the grader:
+Anson Doan and Anand Shatdal did not contribute to a2.

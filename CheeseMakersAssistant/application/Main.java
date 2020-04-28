@@ -88,8 +88,12 @@ public class Main extends Application {
       durationReport.showWindow(primaryStage, man);
     });
     
+    Button exitWindowButton = new Button("Exit");
+    exitWindowButton.setOnAction(actionEvent -> {
+    	Platform.exit();
+    });
     
-    vbox.getChildren().addAll(loadFromFileButton, saveToFileButton, editDataButton, farmReportButton, durationReportButton);
+    vbox.getChildren().addAll(loadFromFileButton, saveToFileButton, editDataButton, farmReportButton, durationReportButton, exitWindowButton);
     root.setCenter(vbox);
     
     Scene mainScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
