@@ -1,6 +1,7 @@
 package application;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import javafx.application.Application;
@@ -28,6 +29,7 @@ public class Main extends Application {
   private EditDataWindow editData;
   private DurationReport durationReport;
   private FarmReport farmReport;
+  private Manager man;
 
   /**
    * Start method
@@ -36,6 +38,7 @@ public class Main extends Application {
   @Override
   public void start(Stage primaryStage) {
     
+    man = new Manager();
     BorderPane root = new BorderPane();
 
     editData = new EditDataWindow(primaryStage);
@@ -51,6 +54,16 @@ public class Main extends Application {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Load File");
       fileChooser.showOpenDialog(primaryStage);
+      try {
+        CheeseReader reader = new CheeseReader(new File("test.txt"), man);
+        reader.read();
+        AssistantWindow.setNames(man.getNames());
+        AssistantWindow.setYears(man.getYears());
+      } catch (FileNotFoundException e) {
+        System.out.println("didn't find file");
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     });
     
     Button saveToFileButton = new Button("Save to File");
@@ -62,17 +75,17 @@ public class Main extends Application {
     
     Button editDataButton = new Button("Edit Data");
     editDataButton.setOnAction(actionEvent -> {
-      editData.showWindow(primaryStage);
+      editData.showWindow(primaryStage, man);
     });
     
     Button farmReportButton = new Button("Farm Report");
     farmReportButton.setOnAction(actionEvent -> {
-      farmReport.showWindow(primaryStage);
+      farmReport.showWindow(primaryStage, man);
     });
     
     Button durationReportButton = new Button("Duration Report");
     durationReportButton.setOnAction(actionEvent -> {
-      durationReport.showWindow(primaryStage);
+      durationReport.showWindow(primaryStage, man);
     });
     
     

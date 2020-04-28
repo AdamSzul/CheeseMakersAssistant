@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 
 import java.time.Month;
 import java.time.YearMonth;
+import java.util.GregorianCalendar;
 
 
 /**
@@ -61,7 +62,7 @@ public class DurationReport extends AssistantWindow{
     
     HBox radioHBox = new HBox(rb1, rb2, rb3);
     
-    yearChoiceBox = new ChoiceBox<String>(YEARS);
+    yearChoiceBox = new ChoiceBox<String>(years);
     HBox yearHBox = new HBox(new Label("Year"), yearChoiceBox);
     monthChoiceBox = new ChoiceBox<Month>(MONTHS);
     HBox monthHBox = new HBox(new Label("Month"), monthChoiceBox);
@@ -74,7 +75,7 @@ public class DurationReport extends AssistantWindow{
     dayEnd.setPrefWidth(40.0);
     HBox endDayHBox = new HBox(new Label("Day"), dayEnd);
 
-    endYearChoiceBox = new ChoiceBox<String>(YEARS);
+    endYearChoiceBox = new ChoiceBox<String>(years);
     HBox endYearHBox = new HBox(new Label("Year"), endYearChoiceBox);
     endMonthChoiceBox = new ChoiceBox<Month>(MONTHS);
     HBox endMonthHBox = new HBox(new Label("Month"), endMonthChoiceBox);
@@ -250,14 +251,23 @@ public class DurationReport extends AssistantWindow{
         tableTitle.set("Yearly Report for " + startYear);
     }
     
-    int value = startYear + endYear + startMonth.getValue() 
-                + endMonth.getValue() + startDay + endDay;
+    GregorianCalendar start = new GregorianCalendar(startYear,startMonth.getValue() - 1,startDay);
+    GregorianCalendar end = new GregorianCalendar(endYear,endMonth.getValue() - 1,endDay);
     list.clear();
-    for(String s : NAMES) {
-      list.add(new Row(s, (s.hashCode() + value) % 1000, (s.hashCode() + value) % 47));
+    int total = man.getTotal(start, end);
+    for(String s : names) {
+      int farmTotal = man.getTotalForFarm(s, start, end);
+      list.add(new Row(s, farmTotal, 100 * farmTotal / total));
     }
     loadMsg.set("Data loaded");
     table.refresh();
+  }
+  
+  @Override
+  public void showWindow(Stage stage, Manager man) {
+    super.showWindow(stage, man);
+    yearChoiceBox.setItems(years);
+    endYearChoiceBox.setItems(years);
   }
 }
 

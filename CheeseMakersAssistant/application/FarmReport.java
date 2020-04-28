@@ -1,6 +1,8 @@
 package application;
 
 import java.time.Month;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -98,11 +100,9 @@ public class FarmReport extends AssistantWindow{
   }
   
   private HBox buildTableID() {
-    farmSelect = new ComboBox<String>(NAMES);
-    farmSelect.setEditable(true);
+    farmSelect = new ComboBox<String>(names);
     farmSelect.setPromptText("Insert Name");
-    yearSelect = new ComboBox<String>(YEARS);
-    yearSelect.setEditable(true);
+    yearSelect = new ComboBox<String>(years);
     yearSelect.setPromptText("Insert Year");
     yearSelect.setPrefWidth(100);
 
@@ -133,12 +133,22 @@ public class FarmReport extends AssistantWindow{
     list.clear();
     
     //Simulates loading data into list.
-    int value = farm.hashCode() + year;
     for(Month m : MONTHS) {
-      list.add(new Row(m, 1000 + value * m.getValue() % 1000, 45 + value * m.getValue() % 45));
+      GregorianCalendar startDate = new GregorianCalendar(year, m.getValue() - 1, 1);
+      GregorianCalendar endDate = (GregorianCalendar) startDate.clone();
+      endDate.roll(Calendar.DAY_OF_MONTH, -1);
+      int total = man.getTotalForFarm(farm, startDate, endDate);
+      list.add(new Row(m, total, 100 * total / man.getTotal(startDate, endDate)));
     }
     table.refresh();
     loadMsg.set("Data loaded");
     tableTitle.set(farm + ", " + year);
+  }
+  
+  @Override
+  public void showWindow(Stage stage, Manager man) {
+    super.showWindow(stage, man);
+    farmSelect.setItems(names);
+    yearSelect.setItems(years);
   }
 }

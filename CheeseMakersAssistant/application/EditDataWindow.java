@@ -139,11 +139,11 @@ public class EditDataWindow extends AssistantWindow{
    */
   private HBox buildTableID() {
     
-    farmSelect = new ComboBox<String>(NAMES);
+    farmSelect = new ComboBox<String>(names);
     farmSelect.setEditable(true);
     farmSelect.setPromptText("Insert Name");
     
-    yearSelect = new ComboBox<String>(YEARS);
+    yearSelect = new ComboBox<String>(years);
     yearSelect.setEditable(true);
     yearSelect.setPromptText("Insert Year");
     yearSelect.setPrefWidth(100);
@@ -191,11 +191,12 @@ public class EditDataWindow extends AssistantWindow{
     }
     
     saveList.clear();
-    date = new GregorianCalendar(year, month.getValue(), 1);
+    date = new GregorianCalendar(year, month.getValue() - 1, 1);
     
     //Simulation of loading data into saveList
     for(int i = 1; i <= date.getActualMaximum(Calendar.DAY_OF_MONTH); i++) {
-      saveList.add(new Row(i, i * 100 + year + farmID.hashCode() % 1000));
+      date.set(Calendar.DAY_OF_MONTH, i);
+      saveList.add(new Row(i, man.get(farmID, date)));
     }
     
     list.clear();
@@ -311,5 +312,11 @@ public class EditDataWindow extends AssistantWindow{
       updateMsg.set("Day " + changeDay + " updated to " + newWeight);
       tableChanged = true;
     }
+  }
+  @Override
+  public void showWindow(Stage stage, Manager man) {
+    super.showWindow(stage, man);
+    farmSelect.setItems(names);
+    yearSelect.setItems(years);
   }
 }

@@ -1,6 +1,8 @@
 package application;
 
 import java.time.Month;
+import java.util.ArrayList;
+
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -20,17 +22,18 @@ public abstract class AssistantWindow {
   protected static final int WINDOW_WIDTH = 600;
   protected static final int WINDOW_HEIGHT = 500;
   
-  protected static final ObservableList<String> NAMES =
-      FXCollections.observableArrayList("Farm 1", "Farm 2", "Farm 3", "Farm 4", "Farm 5");
+  protected static ObservableList<String> names =
+      FXCollections.observableArrayList();
   
-  protected static final ObservableList<String> YEARS = 
-      FXCollections.observableArrayList("2016", "2017", "2018", "2019", "2020");
+  protected static ObservableList<String> years = 
+      FXCollections.observableArrayList();
   
   protected static final ObservableList<Month> MONTHS =
       FXCollections.observableArrayList(Month.values());
   
   protected Scene scene;
   protected Scene old;
+  protected Manager man;
   
   /**
    * Class that allows elements to be loaded into the table.
@@ -103,8 +106,17 @@ public abstract class AssistantWindow {
    * 
    * @param stage that the scene will be displayed to.
    */
-  public void showWindow(Stage stage) {
+  public void showWindow(Stage stage, Manager man) {
+    this.man = man;
     old = stage.getScene();
     stage.setScene(scene);
+  }
+  
+  static void setNames(ArrayList<String> names) {
+    AssistantWindow.names = FXCollections.observableArrayList(names);
+  }
+  
+  static void setYears(ArrayList<String> years) {
+    AssistantWindow.years = FXCollections.observableArrayList(years);
   }
 }
