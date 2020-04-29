@@ -137,8 +137,8 @@ public class FarmReport extends AssistantWindow{
       GregorianCalendar startDate = new GregorianCalendar(year, m.getValue() - 1, 1);
       GregorianCalendar endDate = (GregorianCalendar) startDate.clone();
       endDate.roll(Calendar.DAY_OF_MONTH, -1);
-      int total = man.getTotalForFarm(farm, startDate, endDate);
-      list.add(new Row(m, total, 100 * total / man.getTotal(startDate, endDate)));
+      int total = factory.getTotalForFarm(farm, startDate, endDate);
+      list.add(new Row(m, total, 100 * total / factory.getTotal(startDate, endDate)));
     }
     table.refresh();
     loadMsg.set("Data loaded");
@@ -146,7 +146,7 @@ public class FarmReport extends AssistantWindow{
   }
   
   @Override
-  public void showWindow(Stage stage, Manager man) {
+  public void showWindow(Stage stage, CheeseFactory man) {
     super.showWindow(stage, man);
     farmSelect.setItems(names);
     yearSelect.setItems(years);

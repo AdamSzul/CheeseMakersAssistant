@@ -5,12 +5,12 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
-public class Manager {
+public class CheeseFactory {
   HashMap<String, Farm> farmMap;
   ArrayList<String> farmNames;
   ArrayList<String> years;
   
-  public Manager() {
+  public CheeseFactory() {
     farmMap = new HashMap<String, Farm>();
     farmNames = new ArrayList<String>();
     years = new ArrayList<String>();

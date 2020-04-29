@@ -21,3 +21,7 @@
 /Farm.class
 /Manager.class
 /CheeseReader.class
+/Stats.class
+/FileManager.class
+/FileManager$InsertObject.class
+/CheeseFactory.class

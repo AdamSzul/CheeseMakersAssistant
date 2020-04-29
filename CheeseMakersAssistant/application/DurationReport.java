@@ -254,9 +254,9 @@ public class DurationReport extends AssistantWindow{
     GregorianCalendar start = new GregorianCalendar(startYear,startMonth.getValue() - 1,startDay);
     GregorianCalendar end = new GregorianCalendar(endYear,endMonth.getValue() - 1,endDay);
     list.clear();
-    int total = man.getTotal(start, end);
+    int total = factory.getTotal(start, end);
     for(String s : names) {
-      int farmTotal = man.getTotalForFarm(s, start, end);
+      int farmTotal = factory.getTotalForFarm(s, start, end);
       list.add(new Row(s, farmTotal, 100 * farmTotal / total));
     }
     loadMsg.set("Data loaded");
@@ -264,8 +264,8 @@ public class DurationReport extends AssistantWindow{
   }
   
   @Override
-  public void showWindow(Stage stage, Manager man) {
-    super.showWindow(stage, man);
+  public void showWindow(Stage stage, CheeseFactory factory) {
+    super.showWindow(stage, factory);
     yearChoiceBox.setItems(years);
     endYearChoiceBox.setItems(years);
   }

@@ -196,7 +196,7 @@ public class EditDataWindow extends AssistantWindow{
     //Simulation of loading data into saveList
     for(int i = 1; i <= date.getActualMaximum(Calendar.DAY_OF_MONTH); i++) {
       date.set(Calendar.DAY_OF_MONTH, i);
-      saveList.add(new Row(i, man.get(farmID, date)));
+      saveList.add(new Row(i, factory.get(farmID, date)));
     }
     
     list.clear();
@@ -314,8 +314,8 @@ public class EditDataWindow extends AssistantWindow{
     }
   }
   @Override
-  public void showWindow(Stage stage, Manager man) {
-    super.showWindow(stage, man);
+  public void showWindow(Stage stage, CheeseFactory factory) {
+    super.showWindow(stage, factory);
     farmSelect.setItems(names);
     yearSelect.setItems(years);
   }

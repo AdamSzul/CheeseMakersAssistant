@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.List;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -29,7 +30,8 @@ public class Main extends Application {
   private EditDataWindow editData;
   private DurationReport durationReport;
   private FarmReport farmReport;
-  private Manager man;
+  private CheeseFactory factory;
+  FileManager IOmanager;
 
   /**
    * Start method
@@ -38,7 +40,8 @@ public class Main extends Application {
   @Override
   public void start(Stage primaryStage) {
     
-    man = new Manager();
+    factory = new CheeseFactory();
+    IOmanager = new FileManager(factory);
     BorderPane root = new BorderPane();
 
     editData = new EditDataWindow(primaryStage);
@@ -53,12 +56,11 @@ public class Main extends Application {
     loadFromFileButton.setOnAction(actionEvent -> {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Load File");
-      fileChooser.showOpenDialog(primaryStage);
+      File file = fileChooser.showOpenDialog(primaryStage);
       try {
-        CheeseReader reader = new CheeseReader(new File("test.txt"), man);
-        reader.read();
-        AssistantWindow.setNames(man.getNames());
-        AssistantWindow.setYears(man.getYears());
+        IOmanager.read(file);
+        AssistantWindow.setNames(factory.getNames());
+        AssistantWindow.setYears(factory.getYears());
       } catch (FileNotFoundException e) {
         System.out.println("didn't find file");
       } catch (Exception e) {
@@ -75,17 +77,17 @@ public class Main extends Application {
     
     Button editDataButton = new Button("Edit Data");
     editDataButton.setOnAction(actionEvent -> {
-      editData.showWindow(primaryStage, man);
+      editData.showWindow(primaryStage, factory);
     });
     
     Button farmReportButton = new Button("Farm Report");
     farmReportButton.setOnAction(actionEvent -> {
-      farmReport.showWindow(primaryStage, man);
+      farmReport.showWindow(primaryStage, factory);
     });
     
     Button durationReportButton = new Button("Duration Report");
     durationReportButton.setOnAction(actionEvent -> {
-      durationReport.showWindow(primaryStage, man);
+      durationReport.showWindow(primaryStage, factory);
     });
     
     Button exitWindowButton = new Button("Exit");
