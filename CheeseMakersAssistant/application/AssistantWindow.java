@@ -34,6 +34,7 @@ public abstract class AssistantWindow {
   protected Scene scene;
   protected Scene old;
   protected CheeseFactory factory;
+  protected FileManager IOManager;
   
   /**
    * Class that allows elements to be loaded into the table.
@@ -106,8 +107,9 @@ public abstract class AssistantWindow {
    * 
    * @param stage that the scene will be displayed to.
    */
-  public void showWindow(Stage stage, CheeseFactory factory) {
+  public void showWindow(Stage stage, CheeseFactory factory, FileManager IOManager) {
     this.factory = factory;
+    this.IOManager = IOManager;
     old = stage.getScene();
     stage.setScene(scene);
   }

@@ -1,8 +1,11 @@
 package application;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.Month;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -18,6 +21,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 /**
@@ -43,6 +47,8 @@ public class EditDataWindow extends AssistantWindow{
   private SimpleStringProperty tableTitle;
   private boolean tableChanged = false;
   private GregorianCalendar date;
+  private String farmID;
+  private Stage stage;
   
   /**
    * Constructor that initializes the screen for this window.
@@ -51,6 +57,7 @@ public class EditDataWindow extends AssistantWindow{
    */
   public EditDataWindow(Stage stage) {
 
+    this.stage = stage;
     Button back = new Button("Back");
     back.setOnAction(actionEvent -> {
       stage.setScene(old);
@@ -67,7 +74,7 @@ public class EditDataWindow extends AssistantWindow{
     
     Button loadButton = new Button("Load Table");
     loadButton.setOnAction(actionEvent -> {
-      loadData();
+      loadTable();
     });
     
     Label loadStatus = new Label();
@@ -96,7 +103,7 @@ public class EditDataWindow extends AssistantWindow{
                          bottom);
     
     top.setSpacing(WINDOW_WIDTH / 3.0);
-    bottom.setSpacing(WINDOW_WIDTH - 93.0);
+    bottom.setSpacing(200);
     root.setSpacing(5.0);
     updatePrompt.setSpacing(5.0);
     loadBox.setSpacing(5.0);
@@ -161,9 +168,9 @@ public class EditDataWindow extends AssistantWindow{
    * will return if the entered data does not match the required form 
    * and will inform the user.
    */
-  private void loadData() {
+  private void loadTable() {
     
-    String farmID = farmSelect.getValue();
+    farmID = farmSelect.getValue();
     String yearInput = yearSelect.getValue();
     Month month = monthSelect.getValue();
     int year;
@@ -195,8 +202,8 @@ public class EditDataWindow extends AssistantWindow{
     
     //Simulation of loading data into saveList
     for(int i = 1; i <= date.getActualMaximum(Calendar.DAY_OF_MONTH); i++) {
-      date.set(Calendar.DAY_OF_MONTH, i);
       saveList.add(new Row(i, factory.get(farmID, date)));
+      date.roll(Calendar.DAY_OF_MONTH, 1);
     }
     
     list.clear();
@@ -245,19 +252,47 @@ public class EditDataWindow extends AssistantWindow{
       }
     });
     
-    Button save = new Button("Save");
-    save.setOnAction(actionEvent -> {
+    Button saveTable = new Button("Save Table");
+    saveTable.setOnAction(actionEvent -> {
       if (tableChanged) {
         saveList.clear();
         
-        for(Row r : list)
+        for(Row r : list) {
           saveList.add(r);
-        
-        updateMsg.set("Data saved");
+          factory.insert(farmID, date, r.getWeight());
+          date.roll(Calendar.DAY_OF_MONTH, 1);
+        }
+      }
+        updateMsg.set("Table saved");
         tableChanged = false;
+    });
+    Button saveToFile = new Button("Save to File");
+    saveToFile.setOnAction(actionEvent -> {
+      List<String[]> printList = factory.saveToFile(date);
+      FileChooser fileChooser = new FileChooser();
+      fileChooser.setTitle("Save File");
+      File file = fileChooser.showSaveDialog(stage);
+      if (file != null) {
+        if (tableChanged) {
+          saveList.clear();
+          
+          for(Row r : list) {
+            saveList.add(r);
+            factory.insert(farmID, date, r.getWeight());
+            date.roll(Calendar.DAY_OF_MONTH, 1);
+          }
+          tableChanged = false;
+        }
+        
+        try {
+          IOManager.write(file, "date,farm_id,weight", printList);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+        updateMsg.set("Data saved");
       }
     });
-    return new HBox(cancel, save);
+    return new HBox(cancel, saveTable, saveToFile);
   }
   
   /**
@@ -313,9 +348,10 @@ public class EditDataWindow extends AssistantWindow{
       tableChanged = true;
     }
   }
+  
   @Override
-  public void showWindow(Stage stage, CheeseFactory factory) {
-    super.showWindow(stage, factory);
+  public void showWindow(Stage stage, CheeseFactory factory, FileManager IOManager) {
+    super.showWindow(stage, factory, IOManager);
     farmSelect.setItems(names);
     yearSelect.setItems(years);
   }

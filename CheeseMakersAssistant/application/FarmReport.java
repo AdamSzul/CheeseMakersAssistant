@@ -146,8 +146,8 @@ public class FarmReport extends AssistantWindow{
   }
   
   @Override
-  public void showWindow(Stage stage, CheeseFactory man) {
-    super.showWindow(stage, man);
+  public void showWindow(Stage stage, CheeseFactory man, FileManager IOManager) {
+    super.showWindow(stage, man, IOManager);
     farmSelect.setItems(names);
     yearSelect.setItems(years);
   }

@@ -31,7 +31,7 @@ public class Main extends Application {
   private DurationReport durationReport;
   private FarmReport farmReport;
   private CheeseFactory factory;
-  FileManager IOmanager;
+  FileManager IOManager;
 
   /**
    * Start method
@@ -41,7 +41,7 @@ public class Main extends Application {
   public void start(Stage primaryStage) {
     
     factory = new CheeseFactory();
-    IOmanager = new FileManager(factory);
+    IOManager = new FileManager(factory);
     BorderPane root = new BorderPane();
 
     editData = new EditDataWindow(primaryStage);
@@ -58,7 +58,7 @@ public class Main extends Application {
       fileChooser.setTitle("Load File");
       File file = fileChooser.showOpenDialog(primaryStage);
       try {
-        IOmanager.read(file);
+        IOManager.read(file);
         AssistantWindow.setNames(factory.getNames());
         AssistantWindow.setYears(factory.getYears());
       } catch (FileNotFoundException e) {
@@ -68,26 +68,19 @@ public class Main extends Application {
       }
     });
     
-    Button saveToFileButton = new Button("Save to File");
-    saveToFileButton.setOnAction(actionEvent -> {
-      FileChooser fileChooser = new FileChooser();
-      fileChooser.setTitle("Save File");
-      fileChooser.showSaveDialog(primaryStage);
-    });
-    
     Button editDataButton = new Button("Edit Data");
     editDataButton.setOnAction(actionEvent -> {
-      editData.showWindow(primaryStage, factory);
+      editData.showWindow(primaryStage, factory, IOManager);
     });
     
     Button farmReportButton = new Button("Farm Report");
     farmReportButton.setOnAction(actionEvent -> {
-      farmReport.showWindow(primaryStage, factory);
+      farmReport.showWindow(primaryStage, factory, IOManager);
     });
     
     Button durationReportButton = new Button("Duration Report");
     durationReportButton.setOnAction(actionEvent -> {
-      durationReport.showWindow(primaryStage, factory);
+      durationReport.showWindow(primaryStage, factory, IOManager);
     });
     
     Button exitWindowButton = new Button("Exit");
@@ -95,7 +88,7 @@ public class Main extends Application {
     	Platform.exit();
     });
     
-    vbox.getChildren().addAll(loadFromFileButton, saveToFileButton, editDataButton, farmReportButton, durationReportButton, exitWindowButton);
+    vbox.getChildren().addAll(loadFromFileButton, editDataButton, farmReportButton, durationReportButton, exitWindowButton);
     root.setCenter(vbox);
     
     Scene mainScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);

@@ -2,9 +2,15 @@ package application;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
+
+import application.AssistantWindow.Row;
 
 public class FileManager {
 
@@ -35,6 +41,7 @@ public class FileManager {
       lineParse(order[1], data[1], insert);
       lineParse(order[2], data[2], insert);
     }
+    scnr.close();
     
     for(InsertObject i : list) {
       factory.insert(i.name, i.date, i.weight);
@@ -67,5 +74,14 @@ public class FileManager {
   
   public void write() {
     
+  }
+  
+  public void write(File file, String title, List<String[]> list) throws IOException {
+    PrintWriter writer = new PrintWriter(file);
+    writer.write(title);
+    for(String[] s : list) {
+      writer.print("\n" + s[0] + "," + s[1] + "," + s[2]);
+    }
+    writer.close();
   }
 }

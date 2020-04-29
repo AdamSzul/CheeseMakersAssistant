@@ -264,8 +264,8 @@ public class DurationReport extends AssistantWindow{
   }
   
   @Override
-  public void showWindow(Stage stage, CheeseFactory factory) {
-    super.showWindow(stage, factory);
+  public void showWindow(Stage stage, CheeseFactory factory, FileManager IOManager) {
+    super.showWindow(stage, factory, IOManager);
     yearChoiceBox.setItems(years);
     endYearChoiceBox.setItems(years);
   }

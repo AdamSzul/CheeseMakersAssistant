@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 public class CheeseFactory {
   HashMap<String, Farm> farmMap;
@@ -65,5 +67,22 @@ public class CheeseFactory {
     if (total == 0)
       total++;
     return total;
+  }
+  
+  public List<String[]> saveToFile(GregorianCalendar date) {
+    LinkedList<String[]> printList = new LinkedList<String[]>();
+    for(String farmID : farmNames) {
+      for(int i = date.getMaximum(Calendar.DAY_OF_MONTH); i > 0; i--) {
+        String[] line = new String[3];
+        printList.add(line);
+        line[0] = Integer.toString(date.get(Calendar.YEAR)) + "-" + 
+                  Integer.toString(date.get(Calendar.MONTH) + 1) + "-" +
+                  Integer.toString(date.get(Calendar.DAY_OF_MONTH));
+        line[1] = farmID;
+        line[2] = Integer.toString(get(farmID,date));
+        date.roll(Calendar.DAY_OF_MONTH, 1);
+      }
+    }
+    return printList;
   }
 }
