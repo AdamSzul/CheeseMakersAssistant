@@ -9,11 +9,15 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.Month;
 import java.time.YearMonth;
 import java.util.GregorianCalendar;
+import java.util.LinkedList;
 
 
 /**
@@ -125,6 +129,31 @@ public class DurationReport extends AssistantWindow{
             break;
         }
     });
+    
+    Button saveToFile = new Button("Save to File");
+    saveToFile.setOnAction(actionEvent -> {
+      LinkedList<String[]> printList = new LinkedList<String[]>();
+      FileChooser fileChooser = new FileChooser();
+      fileChooser.setTitle("Save File");
+      File file = fileChooser.showSaveDialog(stage);
+      if (file != null) {
+        for(Row r : list) {
+          String[] line = new String[3];
+          printList.add(line);
+          line[0] = r.getRowName();
+          line[1] = Integer.toString(r.getWeight());
+          line[2] = Integer.toString(r.getRowValue());
+        }
+        
+        try {
+          IOManager.write(file, "farm_id,weight,percent", printList);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    });
+    
+    root.setBottom(saveToFile);
     
     VBox vbox = new VBox(
             radioHBox,

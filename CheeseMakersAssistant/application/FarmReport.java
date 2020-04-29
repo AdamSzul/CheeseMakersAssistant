@@ -1,8 +1,11 @@
 package application;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.Month;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.LinkedList;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -17,6 +20,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 /**
@@ -63,13 +67,37 @@ public class FarmReport extends AssistantWindow{
     
     buildTable();
     
+    Button saveToFile = new Button("Save to File");
+    saveToFile.setOnAction(actionEvent -> {
+      LinkedList<String[]> printList = new LinkedList<String[]>();
+      FileChooser fileChooser = new FileChooser();
+      fileChooser.setTitle("Save File");
+      File file = fileChooser.showSaveDialog(stage);
+      if (file != null) {
+        for(Row r : list) {
+          String[] line = new String[3];
+          printList.add(line);
+          line[0] = r.getRowName();
+          line[1] = Integer.toString(r.getWeight());
+          line[2] = Integer.toString(r.getRowValue());
+        }
+        
+        try {
+          IOManager.write(file, "month,weight,percent", printList);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    });
+    
     HBox loadBox = new HBox(loadButton, loadStatus);
     HBox top = new HBox(backButton, sceneTitle);
     VBox root = new VBox(top,
                          tableID, 
                          loadBox,
                          loadTitle,
-                         table);
+                         table,
+                         saveToFile);
     
     root.setSpacing(5.0);
     loadBox.setSpacing(5.0);

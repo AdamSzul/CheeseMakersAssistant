@@ -268,7 +268,6 @@ public class EditDataWindow extends AssistantWindow{
     });
     Button saveToFile = new Button("Save to File");
     saveToFile.setOnAction(actionEvent -> {
-      List<String[]> printList = factory.saveToFile(date);
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Save File");
       File file = fileChooser.showSaveDialog(stage);
@@ -284,6 +283,8 @@ public class EditDataWindow extends AssistantWindow{
           tableChanged = false;
         }
         
+        List<String[]> printList = factory.saveToFile(date);
+
         try {
           IOManager.write(file, "date,farm_id,weight", printList);
         } catch (IOException e) {
