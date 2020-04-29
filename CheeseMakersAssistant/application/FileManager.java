@@ -68,10 +68,6 @@ public class FileManager {
     }
   }
   
-  public void write() {
-    
-  }
-  
   public void write(File file, String title, List<String[]> list) throws IOException {
     PrintWriter writer = new PrintWriter(file);
     writer.write(title);
