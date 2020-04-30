@@ -205,7 +205,12 @@ public class EditDataWindow extends AssistantWindow{
     
     //Simulation of loading data into saveList
     for(int i = 1; i <= date.getActualMaximum(Calendar.DAY_OF_MONTH); i++) {
-      saveList.add(new Row(i, factory.get(farmID, date)));
+      Farm farm = factory.getFarm(farmID);
+      int weight = 0;
+      if(farm != null){
+        weight = farm.get(date);
+      }
+      saveList.add(new Row(i, weight));
       date.roll(Calendar.DAY_OF_MONTH, 1);
     }
     

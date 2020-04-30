@@ -39,18 +39,19 @@ public class CheeseFactory {
       years.add(year);
     }
   }
-  
-  public int get(String name, GregorianCalendar date) {
-    if (farmMap.containsKey(name))
-      return farmMap.get(name).get(date);
-    else
-      return 0;
-  }
-  
+
+  /**
+   * Get the names
+   * @return the names
+   */
   public ArrayList<String> getNames() {
     return new ArrayList(farmMap.keySet());
   }
-  
+
+  /**
+   * Get the years
+   * @return the years
+   */
   public ArrayList<String> getYears() {
     return years;
   }

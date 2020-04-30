@@ -6,7 +6,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -18,15 +17,13 @@ import java.io.IOException;
 import java.time.Month;
 import java.time.YearMonth;
 import java.util.GregorianCalendar;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
 /**
- * 
+ * The duration report
  * @authors Michael, Adam
- *
  */
 public class DurationReport extends AssistantWindow{
 
@@ -42,7 +39,11 @@ public class DurationReport extends AssistantWindow{
   Report report = Report.RANGE;
   SimpleStringProperty loadMsg;
   SimpleStringProperty tableTitle;
-  
+
+  /**
+   * Create duration report
+   * @param stage the stage
+   */
   DurationReport(Stage stage){
     
     list = FXCollections.observableArrayList();
@@ -174,7 +175,10 @@ public class DurationReport extends AssistantWindow{
     );
     scene = new Scene(new VBox(top, vbox, saveToFile), WINDOW_WIDTH, WINDOW_HEIGHT);  
   }
-  
+
+  /**
+   * Construct the table
+   */
   private void buildTable() {
     
     table = new TableView<Row>();
@@ -192,7 +196,10 @@ public class DurationReport extends AssistantWindow{
     
     table.setItems(list);
   }
-  
+
+  /**
+   * Load data into the table
+   */
   private void loadData() {
     int startYear = 0;
     int endYear = 0;
@@ -303,7 +310,12 @@ public class DurationReport extends AssistantWindow{
     tableTitle.set(tableTitle.get() + " | " + statsString);
     table.refresh();
   }
-  
+
+  /**
+   * Show the window
+   * @param stage that the scene will be displayed to.
+   * @param factory the factory
+   */
   @Override
   public void showWindow(Stage stage, CheeseFactory factory) {
     super.showWindow(stage, factory);

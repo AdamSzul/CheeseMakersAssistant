@@ -83,22 +83,31 @@ public abstract class AssistantWindow {
       this.weight = new SimpleIntegerProperty(totalWeight);
       this.rowValue = new SimpleIntegerProperty(percentWeight);
     }
-    
+
+    /**
+     * Get the row value
+     * @return the row value
+     */
     public int getRowValue() {
       return rowValue.get();
     }
-      
+
+    /**
+     * Get the weight
+     * @return the weight
+     */
     public int getWeight() {
       return weight.get();
     }
-    
+
+    /**
+     * The row name
+     * @return the name
+     */
     public String getRowName() {
       return rowName.get();
     }
-       
-    public void setWeight(int newWeight) {
-      this.weight.set(newWeight);;
-    }
+    
   }
   
   /**
@@ -111,11 +120,19 @@ public abstract class AssistantWindow {
     old = stage.getScene();
     stage.setScene(scene);
   }
-  
+
+  /**
+   * Set the names
+   * @param names the names
+   */
   static void setNames(ArrayList<String> names) {
     AssistantWindow.names = FXCollections.observableArrayList(names);
   }
-  
+
+  /**
+   * Set teh years
+   * @param years the years
+   */
   static void setYears(ArrayList<String> years) {
     AssistantWindow.years = FXCollections.observableArrayList(years);
   }

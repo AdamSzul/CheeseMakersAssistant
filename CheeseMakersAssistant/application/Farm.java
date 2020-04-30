@@ -37,8 +37,12 @@ public class Farm {
     else
       return 0;
   }
-  
-  public HashMap<GregorianCalendar, Integer> getShipments() {
+
+  /**
+   * Get the shipments map
+   * @return the shipments
+   */
+  public Map<GregorianCalendar, Integer> getShipments() {
     return shipments;
   }
 

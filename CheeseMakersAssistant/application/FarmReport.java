@@ -112,7 +112,10 @@ public class FarmReport extends AssistantWindow{
     scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
     
   }
-  
+
+  /**
+   * Build the table
+   */
   private void buildTable() {
     table = new TableView<Row>();
     
@@ -187,10 +190,15 @@ public class FarmReport extends AssistantWindow{
     String statsString = "Min: " + Stats.min(weights) + ", Avg: " + Stats.avg(weights) + ", Max: " + Stats.max(weights);
     tableTitle.set(farm + ", " + year + " | " + statsString);
   }
-  
+
+  /**
+   * Show the window
+   * @param stage that the scene will be displayed to.
+   * @param factory the factory
+   */
   @Override
-  public void showWindow(Stage stage, CheeseFactory man) {
-    super.showWindow(stage, man);
+  public void showWindow(Stage stage, CheeseFactory factory) {
+    super.showWindow(stage, factory);
     farmSelect.setItems(names);
     yearSelect.setItems(years);
   }

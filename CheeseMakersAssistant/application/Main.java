@@ -4,13 +4,16 @@ import java.io.File;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -38,7 +41,6 @@ public class Main extends Application {
   public void start(Stage primaryStage) {
     
     factory = new CheeseFactory();
-    BorderPane root = new BorderPane();
 
     editData = new EditDataWindow(primaryStage);
     durationReport = new DurationReport(primaryStage);
@@ -46,7 +48,6 @@ public class Main extends Application {
     
     Label title = new Label("Milk Weights");
     title.setFont(new Font("System Regular", 30));
-    root.setTop(title);
 
     VBox vbox = new VBox();
     
@@ -55,7 +56,9 @@ public class Main extends Application {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Load File");
       File file = fileChooser.showOpenDialog(primaryStage);
-      
+      if(file == null){
+        return;
+      }
       try {
         factory.read(file);
         AssistantWindow.setNames(factory.getNames());
@@ -68,6 +71,36 @@ public class Main extends Application {
         e.printStackTrace();
         Alert a = new Alert(Alert.AlertType.ERROR);
         a.setTitle("Error while Loading File");
+        a.setContentText(e.getMessage());
+        a.show();
+      }
+    });
+
+    Button loadFromFolderButton = new Button("Load from Folder");
+    loadFromFolderButton.setOnAction(actionEvent -> {
+      DirectoryChooser directoryChooser = new DirectoryChooser();
+      directoryChooser.setTitle("Load File");
+      File directory = directoryChooser.showDialog(primaryStage);
+      if(directory == null){
+        return;
+      }
+      try {
+        for(File file : directory.listFiles()){
+          if(file.getName().endsWith(".csv")){
+            factory.read(file);
+          }
+        }
+        
+        AssistantWindow.setNames(factory.getNames());
+        AssistantWindow.setYears(factory.getYears());
+        Alert a = new Alert(Alert.AlertType.INFORMATION);
+        a.setTitle("Load Complete");
+        a.setContentText("The folder had been loaded.");
+        a.show();
+      }catch (Exception e){
+        e.printStackTrace();
+        Alert a = new Alert(Alert.AlertType.ERROR);
+        a.setTitle("Error while Loading Folder");
         a.setContentText(e.getMessage());
         a.show();
       }
@@ -93,10 +126,13 @@ public class Main extends Application {
     	Platform.exit();
     });
     
-    vbox.getChildren().addAll(loadFromFileButton, editDataButton, farmReportButton, durationReportButton, exitWindowButton);
-    root.setCenter(vbox);
+    vbox.getChildren().addAll(title, loadFromFileButton, loadFromFolderButton, editDataButton, farmReportButton, durationReportButton, exitWindowButton);
+    for(Node node : vbox.getChildren()){
+      ((Control) node).setMinWidth(200);
+    }
+    vbox.setSpacing(1);
     
-    Scene mainScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+    Scene mainScene = new Scene(vbox, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     primaryStage.setTitle(APP_TITLE);
     primaryStage.setScene(mainScene);
