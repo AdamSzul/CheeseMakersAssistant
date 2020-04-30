@@ -16,7 +16,7 @@ public class Farm {
   HashMap<GregorianCalendar, Integer> shipments;
   
   public Farm() {
-    shipments = new HashMap<GregorianCalendar, Integer>();
+    shipments = new HashMap<>();
   }
   
   /**
@@ -71,12 +71,12 @@ public class Farm {
   * @return weights for month
   */
   public List<Integer> forMonth (int year, int month) {
-    List<Integer> inRange = new ArrayList<Integer>();
+    List<Integer> inRange = new ArrayList<>();
     Set<GregorianCalendar> allDates = shipments.keySet();
 		
     for (GregorianCalendar d : allDates) {
       if (d.get(GregorianCalendar.MONTH) == month && d.get(GregorianCalendar.YEAR) == year) { // checks if in range
-	inRange.add(shipments.get(d));
+	      inRange.add(shipments.get(d));
       }
     }
 		

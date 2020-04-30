@@ -8,10 +8,12 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -21,7 +23,6 @@ import javafx.stage.Stage;
  *
  */
 public class Main extends Application {
-  private List<String> args;
   
   private static final int WINDOW_WIDTH = 600;
   private static final int WINDOW_HEIGHT = 500;
@@ -31,7 +32,6 @@ public class Main extends Application {
   private DurationReport durationReport;
   private FarmReport farmReport;
   private CheeseFactory factory;
-  FileManager IOManager;
 
   /**
    * Start method
@@ -41,14 +41,15 @@ public class Main extends Application {
   public void start(Stage primaryStage) {
     
     factory = new CheeseFactory();
-    IOManager = new FileManager(factory);
     BorderPane root = new BorderPane();
 
     editData = new EditDataWindow(primaryStage);
     durationReport = new DurationReport(primaryStage);
     farmReport = new FarmReport(primaryStage);
     
-    root.setTop(new Label("Milk Weights"));
+    Label title = new Label("Milk Weights");
+    title.setFont(new Font("System Regular", 30));
+    root.setTop(title);
 
     VBox vbox = new VBox();
     
@@ -58,29 +59,31 @@ public class Main extends Application {
       fileChooser.setTitle("Load File");
       File file = fileChooser.showOpenDialog(primaryStage);
       try {
-        IOManager.read(file);
+        factory.read(file);
         AssistantWindow.setNames(factory.getNames());
         AssistantWindow.setYears(factory.getYears());
-      } catch (FileNotFoundException e) {
-        System.out.println("didn't find file");
-      } catch (Exception e) {
+      }catch (Exception e){
         e.printStackTrace();
+        Alert a = new Alert(Alert.AlertType.ERROR);
+        a.setTitle("Error while Loading File");
+        a.setContentText(e.getMessage());
+        a.show();
       }
     });
     
     Button editDataButton = new Button("Edit Data");
     editDataButton.setOnAction(actionEvent -> {
-      editData.showWindow(primaryStage, factory, IOManager);
+      editData.showWindow(primaryStage, factory);
     });
     
     Button farmReportButton = new Button("Farm Report");
     farmReportButton.setOnAction(actionEvent -> {
-      farmReport.showWindow(primaryStage, factory, IOManager);
+      farmReport.showWindow(primaryStage, factory);
     });
     
     Button durationReportButton = new Button("Duration Report");
     durationReportButton.setOnAction(actionEvent -> {
-      durationReport.showWindow(primaryStage, factory, IOManager);
+      durationReport.showWindow(primaryStage, factory);
     });
     
     Button exitWindowButton = new Button("Exit");

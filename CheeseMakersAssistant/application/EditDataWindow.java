@@ -72,11 +72,6 @@ public class EditDataWindow extends AssistantWindow{
     //Selection tool for loading data.
     HBox tableID = buildTableID();
     
-    Button loadButton = new Button("Load Table");
-    loadButton.setOnAction(actionEvent -> {
-      loadTable();
-    });
-    
     Label loadStatus = new Label();
     loadMsg = new SimpleStringProperty();
     loadStatus.textProperty().bind(loadMsg);
@@ -92,11 +87,10 @@ public class EditDataWindow extends AssistantWindow{
     
     HBox top = new HBox(back, sceneTitle);
     HBox bottom = buildCancelSave();
-    HBox loadBox = new HBox(loadButton, loadStatus);
     
     VBox root = new VBox(top, 
                          tableID, 
-                         loadBox,
+                         loadStatus,
                          loadTitle,
                          table, 
                          updatePrompt, 
@@ -106,7 +100,6 @@ public class EditDataWindow extends AssistantWindow{
     bottom.setSpacing(200);
     root.setSpacing(5.0);
     updatePrompt.setSpacing(5.0);
-    loadBox.setSpacing(5.0);
     sceneTitle.setFont(new Font("System Regular", 30));
     
     scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -146,17 +139,26 @@ public class EditDataWindow extends AssistantWindow{
    */
   private HBox buildTableID() {
     
-    farmSelect = new ComboBox<String>(names);
+    farmSelect = new ComboBox<>(names);
     farmSelect.setEditable(true);
     farmSelect.setPromptText("Insert Name");
+    farmSelect.valueProperty().addListener(((observable) -> {
+      loadTable();
+    }));
     
-    yearSelect = new ComboBox<String>(years);
+    yearSelect = new ComboBox<>(years);
     yearSelect.setEditable(true);
     yearSelect.setPromptText("Insert Year");
     yearSelect.setPrefWidth(100);
+    yearSelect.valueProperty().addListener(((observable) -> {
+      loadTable();
+    }));
     
-    monthSelect = new ComboBox<Month>(MONTHS);
+    monthSelect = new ComboBox<>(MONTHS);
     monthSelect.setPromptText("Choose Month");
+    monthSelect.valueProperty().addListener(((observable) -> {
+      loadTable();
+    }));
     
     return new HBox(new VBox(new Label("Farm ID"), farmSelect), 
                     new VBox(new Label("Year"), yearSelect), 
@@ -169,7 +171,6 @@ public class EditDataWindow extends AssistantWindow{
    * and will inform the user.
    */
   private void loadTable() {
-    
     farmID = farmSelect.getValue();
     String yearInput = yearSelect.getValue();
     Month month = monthSelect.getValue();
@@ -283,10 +284,8 @@ public class EditDataWindow extends AssistantWindow{
           tableChanged = false;
         }
         
-        List<String[]> printList = factory.saveToFile(date);
-
         try {
-          IOManager.write(file, "date,farm_id,weight", printList);
+          factory.write(file);
         } catch (IOException e) {
           e.printStackTrace();
         }
@@ -351,8 +350,8 @@ public class EditDataWindow extends AssistantWindow{
   }
   
   @Override
-  public void showWindow(Stage stage, CheeseFactory factory, FileManager IOManager) {
-    super.showWindow(stage, factory, IOManager);
+  public void showWindow(Stage stage, CheeseFactory factory) {
+    super.showWindow(stage, factory);
     farmSelect.setItems(names);
     yearSelect.setItems(years);
   }

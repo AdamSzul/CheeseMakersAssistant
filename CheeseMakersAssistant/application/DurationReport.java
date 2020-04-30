@@ -9,6 +9,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -43,13 +44,16 @@ public class DurationReport extends AssistantWindow{
   DurationReport(Stage stage){
     
     list = FXCollections.observableArrayList();
-    BorderPane root = new BorderPane();
+
     Button backButton = new Button("Back");
     backButton.setOnAction(actionEvent -> {
       stage.setScene(old);
     });
-    root.setTop(new Label("Duration Reports"));
-    root.setLeft(backButton);
+    
+    
+    Label title = new Label("Duration Report");
+    title.setFont(new Font("System Regular", 30));
+    HBox top = new HBox(backButton, title);
 
     final ToggleGroup group = new ToggleGroup();
 
@@ -67,21 +71,40 @@ public class DurationReport extends AssistantWindow{
     HBox radioHBox = new HBox(rb1, rb2, rb3);
     
     yearChoiceBox = new ChoiceBox<String>(years);
+    yearChoiceBox.valueProperty().addListener(observable -> {
+      loadData();
+    });
     HBox yearHBox = new HBox(new Label("Year"), yearChoiceBox);
     monthChoiceBox = new ChoiceBox<Month>(MONTHS);
+    monthChoiceBox.valueProperty().addListener(observable -> {
+      loadData();
+    });
     HBox monthHBox = new HBox(new Label("Month"), monthChoiceBox);
     dayStart = new TextField();
     dayStart.setPrefWidth(40.0);
+    dayStart.textProperty().addListener(observable -> {
+      loadData();
+    });
     
     HBox dayHBox = new HBox(new Label("Day"), dayStart);
     
     dayEnd = new TextField();
     dayEnd.setPrefWidth(40.0);
+    dayEnd.textProperty().addListener(observable -> {
+      loadData();
+    });
     HBox endDayHBox = new HBox(new Label("Day"), dayEnd);
 
     endYearChoiceBox = new ChoiceBox<String>(years);
+    endYearChoiceBox.valueProperty().addListener(observable -> {
+      loadData();
+    });
     HBox endYearHBox = new HBox(new Label("Year"), endYearChoiceBox);
+    
     endMonthChoiceBox = new ChoiceBox<Month>(MONTHS);
+    endMonthChoiceBox.valueProperty().addListener(observable -> {
+      loadData();
+    });
     HBox endMonthHBox = new HBox(new Label("Month"), endMonthChoiceBox);
     
     buildTable();
@@ -90,11 +113,6 @@ public class DurationReport extends AssistantWindow{
     Label endLabel = new Label("End");
     VBox startVBox = new VBox(startLabel, yearHBox, monthHBox, dayHBox);
     VBox endVBox = new VBox(endLabel, endYearHBox, endMonthHBox, endDayHBox);
-    
-    Button loadButton = new Button("Load Table");
-    loadButton.setOnAction(actionEvent -> {
-      loadData();
-    });
     
     Label loadStatus = new Label();
     loadMsg = new SimpleStringProperty();
@@ -105,7 +123,8 @@ public class DurationReport extends AssistantWindow{
     loadTitle.textProperty().bind(tableTitle);
     
     group.selectedToggleProperty().addListener((observable, oldVal, newVal) -> {
-        switch (((RadioButton)newVal).getText()){
+      loadData();  
+      switch (((RadioButton)newVal).getText()){
           case "Yearly":
             monthHBox.setVisible(false);
             startLabel.setVisible(false);
@@ -137,33 +156,22 @@ public class DurationReport extends AssistantWindow{
       fileChooser.setTitle("Save File");
       File file = fileChooser.showSaveDialog(stage);
       if (file != null) {
-        for(Row r : list) {
-          String[] line = new String[3];
-          printList.add(line);
-          line[0] = r.getRowName();
-          line[1] = Integer.toString(r.getWeight());
-          line[2] = Integer.toString(r.getRowValue());
-        }
-        
         try {
-          IOManager.write(file, "farm_id,weight,percent", printList);
+          factory.write(file);
         } catch (IOException e) {
           e.printStackTrace();
         }
       }
     });
     
-    root.setBottom(saveToFile);
-    
     VBox vbox = new VBox(
             radioHBox,
             new HBox(startVBox, endVBox),
-            new HBox(loadButton, loadStatus),
+            loadStatus,
             loadTitle,
             table
     );
-    root.setCenter(vbox);
-    scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);  
+    scene = new Scene(new VBox(top, vbox, saveToFile), WINDOW_WIDTH, WINDOW_HEIGHT);  
   }
   
   private void buildTable() {
@@ -172,9 +180,9 @@ public class DurationReport extends AssistantWindow{
     
     TableColumn<Row, String> farmIdCol = new TableColumn<Row, String>("Farm ID");
     farmIdCol.setCellValueFactory(new PropertyValueFactory<>("rowName"));
-    TableColumn<Row, Integer> totalWeightCol = new TableColumn<Row, Integer>("Total Weight");
+    TableColumn<Row, Integer> totalWeightCol = new TableColumn<Row, Integer>("Weight");
     totalWeightCol.setCellValueFactory(new PropertyValueFactory<>("weight"));
-    TableColumn<Row, Integer> percentWeightCol = new TableColumn<Row, Integer>("Percent Weight");
+    TableColumn<Row, Integer> percentWeightCol = new TableColumn<Row, Integer>("Percent");
     percentWeightCol.setCellValueFactory(new PropertyValueFactory<>("rowValue"));
     
     table.getColumns().add(farmIdCol);
@@ -293,8 +301,8 @@ public class DurationReport extends AssistantWindow{
   }
   
   @Override
-  public void showWindow(Stage stage, CheeseFactory factory, FileManager IOManager) {
-    super.showWindow(stage, factory, IOManager);
+  public void showWindow(Stage stage, CheeseFactory factory) {
+    super.showWindow(stage, factory);
     yearChoiceBox.setItems(years);
     endYearChoiceBox.setItems(years);
   }

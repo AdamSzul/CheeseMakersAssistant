@@ -1,6 +1,7 @@
 package application;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.Month;
 import java.util.Calendar;
@@ -38,7 +39,11 @@ public class FarmReport extends AssistantWindow{
   private ComboBox<String> yearSelect;
   private SimpleStringProperty tableTitle;
   private SimpleStringProperty loadMsg;
-  
+
+  /**
+   * Create a FarmReport screen
+   * @param stage the stage to use
+   */
   FarmReport(Stage stage){
     
     list = FXCollections.observableArrayList();
@@ -51,11 +56,6 @@ public class FarmReport extends AssistantWindow{
     Label sceneTitle = new Label("Farm Report");
     
     HBox tableID = buildTableID();
-    
-    Button loadButton = new Button("Generate Report");
-    loadButton.setOnAction(actionEvent -> {
-      loadData();
-    });
     
     Label loadStatus = new Label();
     loadMsg = new SimpleStringProperty();
@@ -74,33 +74,38 @@ public class FarmReport extends AssistantWindow{
       fileChooser.setTitle("Save File");
       File file = fileChooser.showSaveDialog(stage);
       if (file != null) {
-        for(Row r : list) {
-          String[] line = new String[3];
-          printList.add(line);
-          line[0] = r.getRowName();
-          line[1] = Integer.toString(r.getWeight());
-          line[2] = Integer.toString(r.getRowValue());
-        }
-        
+        CSVWriter writer = null;
         try {
-          IOManager.write(file, "month,weight,percent", printList);
-        } catch (IOException e) {
+          writer = new CSVWriter(file);
+          writer.writeRow(new String[]{
+                  "month",
+                  "weight",
+                  "percent"
+          });
+          for(Row row : list) {
+            writer.writeRow(new String[]{
+                    row.getRowName(),
+                    Integer.toString(row.getWeight()),
+                    Integer.toString(row.getRowValue())
+            });
+          }
+          writer.close();
+        } catch (FileNotFoundException e) {
           e.printStackTrace();
         }
       }
     });
     
-    HBox loadBox = new HBox(loadButton, loadStatus);
     HBox top = new HBox(backButton, sceneTitle);
     VBox root = new VBox(top,
-                         tableID, 
-                         loadBox,
-                         loadTitle,
-                         table,
-                         saveToFile);
+            tableID,
+            loadStatus,
+            loadTitle,
+            table,
+            saveToFile
+    );
     
     root.setSpacing(5.0);
-    loadBox.setSpacing(5.0);
     top.setSpacing(WINDOW_WIDTH / 3.0);
     sceneTitle.setFont(new Font("System Regular", 30));
     tableID.setSpacing(5.0);
@@ -130,9 +135,15 @@ public class FarmReport extends AssistantWindow{
   private HBox buildTableID() {
     farmSelect = new ComboBox<String>(names);
     farmSelect.setPromptText("Insert Name");
+    farmSelect.valueProperty().addListener(observable -> {
+      loadData();
+    });
     yearSelect = new ComboBox<String>(years);
     yearSelect.setPromptText("Insert Year");
     yearSelect.setPrefWidth(100);
+    yearSelect.valueProperty().addListener(observable -> {
+      loadData();
+    });
 
     
     return new HBox(new VBox(new Label("Farm ID"), farmSelect), 
@@ -174,8 +185,8 @@ public class FarmReport extends AssistantWindow{
   }
   
   @Override
-  public void showWindow(Stage stage, CheeseFactory man, FileManager IOManager) {
-    super.showWindow(stage, man, IOManager);
+  public void showWindow(Stage stage, CheeseFactory man) {
+    super.showWindow(stage, man);
     farmSelect.setItems(names);
     yearSelect.setItems(years);
   }

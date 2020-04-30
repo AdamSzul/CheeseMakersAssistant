@@ -1,32 +1,42 @@
 package application;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
+/**
+ * Represents a cheese factory
+ */
 public class CheeseFactory {
-  HashMap<String, Farm> farmMap;
-  ArrayList<String> farmNames;
-  ArrayList<String> years;
-  
+  private HashMap<String, Farm> farmMap; // A CheeseFactory farms identified by Strings
+  private ArrayList<String> years; // Years with data
+
+  /**
+   * Construct a cheese
+   */
   public CheeseFactory() {
-    farmMap = new HashMap<String, Farm>();
-    farmNames = new ArrayList<String>();
-    years = new ArrayList<String>();
+    farmMap = new HashMap<>();
+    years = new ArrayList<>();
   }
-  
-  public void insert(String name, GregorianCalendar date, int weight) {
-    if (!farmMap.containsKey(name)) {
+
+  public HashMap<String, Farm> getFarmMap() {
+    return farmMap;
+  }
+
+  /**
+   * Insert a row into a cheese factory
+   * @param farmId the farmId
+   * @param date the date
+   * @param weight the weight
+   */
+  public void insert(String farmId, GregorianCalendar date, int weight) {
+    if (!farmMap.containsKey(farmId)) {
       Farm farm = new Farm();
       farm.insert(date, weight);
-      farmMap.put(name, farm);
-      farmNames.add(name);
+      farmMap.put(farmId, farm);
     }
     else {
-      farmMap.get(name).insert(date, weight);
+      farmMap.get(farmId).insert(date, weight);
     }
     String year = Integer.toString(date.get(Calendar.YEAR));
     if (!years.contains(year)) {
@@ -42,7 +52,7 @@ public class CheeseFactory {
   }
   
   public ArrayList<String> getNames() {
-    return farmNames;
+    return new ArrayList(farmMap.keySet());
   }
   
   public ArrayList<String> getYears() {
@@ -61,28 +71,76 @@ public class CheeseFactory {
   
   public int getTotal(GregorianCalendar startDate, GregorianCalendar endDate) {
     int total = 0;
-    for(String s : farmNames) {
+    for(String s : getNames()) {
       total += getTotalForFarm(s, startDate, endDate);
     }
     if (total == 0)
       total++;
     return total;
   }
-  
-  public List<String[]> saveToFile(GregorianCalendar date) {
-    LinkedList<String[]> printList = new LinkedList<String[]>();
-    for(String farmID : farmNames) {
-      for(int i = date.getMaximum(Calendar.DAY_OF_MONTH); i > 0; i--) {
-        String[] line = new String[3];
-        printList.add(line);
-        line[0] = Integer.toString(date.get(Calendar.YEAR)) + "-" + 
-                  Integer.toString(date.get(Calendar.MONTH) + 1) + "-" +
-                  Integer.toString(date.get(Calendar.DAY_OF_MONTH));
-        line[1] = farmID;
-        line[2] = Integer.toString(get(farmID,date));
-        date.roll(Calendar.DAY_OF_MONTH, 1);
+
+  public void read(File file) throws Exception {
+    Scanner scanner = new Scanner(file);
+    String line = scanner.nextLine();
+    String[] names = line.split(",");
+    int farmIdIndex = -1;
+    int dateIndex = -1;
+    int weightIndex = -1;
+    for(int i = 0; i < names.length; i++){
+      switch (names[i]){
+        case "date": dateIndex = i; break;
+        case "farm_id": farmIdIndex = i; break;
+        case "weight": weightIndex = i; break;
+        default: break;
       }
     }
-    return printList;
+    if(farmIdIndex == -1 || dateIndex == -1 || weightIndex == -1){
+      throw new Exception("Required columns not present");
+    }
+    while(scanner.hasNext()) {
+      line = scanner.nextLine();
+      String[] data = line.split(",");
+      String farmId = data[farmIdIndex];
+      String dataString = data[dateIndex];
+      String[] dateParts = dataString.split("-");
+      GregorianCalendar date = new GregorianCalendar(
+              Integer.parseInt(dateParts[0]),
+              Integer.parseInt(dateParts[1]) - 1,
+              Integer.parseInt(dateParts[2])
+      );
+      int weight = Integer.parseInt(data[weightIndex]);
+      insert(farmId, date, weight);
+    }
+    scanner.close();
+  }
+
+  /**
+   * Write the data to a file
+   * @param file the file to write to
+   * @throws IOException if the file can not be written to
+   */
+  public void write(File file) throws IOException {
+    CSVWriter writer = new CSVWriter(file);
+    writer.writeRow(new String[]{
+            "farm_id",
+            "date",
+            "weight"
+    });
+    for(Map.Entry<String, Farm> farmEntry : farmMap.entrySet()) {
+      String farmId = farmEntry.getKey();
+      Farm farm = farmEntry.getValue();
+      for(Map.Entry<GregorianCalendar, Integer> weightEntry : farm.shipments.entrySet()){
+        GregorianCalendar date = weightEntry.getKey();
+        int weight = weightEntry.getValue();
+        String dateString = date.get(Calendar.YEAR) + "-" + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DAY_OF_MONTH);
+        String weightString = String.valueOf(weight);
+        writer.writeRow(new String[]{
+                farmId,
+                dateString,
+                weightString
+        });
+      }
+    }
+    writer.close();
   }
 }
