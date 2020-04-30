@@ -1,10 +1,6 @@
 package application;
 
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -13,7 +9,7 @@ import java.util.Set;
  *
  */
 public class Farm {
-  HashMap<GregorianCalendar, Integer> shipments;
+  private HashMap<GregorianCalendar, Integer> shipments;
   
   public Farm() {
     shipments = new HashMap<>();
@@ -42,62 +38,25 @@ public class Farm {
       return 0;
   }
   
-  /**
-  * gets the list of weights within the given range
-  * returns empty list if none within range or if farm is empty
-  * 
-  * @param start
-  * @param end
-  * @return weights in range
-  */
-  public List<Integer> forRange (GregorianCalendar start, GregorianCalendar end) {
-    List<Integer> inRange = new ArrayList<Integer>();
-    Set<GregorianCalendar> allDates = shipments.keySet();
-		
-      for (GregorianCalendar d : allDates) {
-        if (d.compareTo(start) >= 0 && d.compareTo(end) <= 0) { // checks if in range
-	  inRange.add(shipments.get(d));
-        }
-      }
-		
-    return inRange;
+  public HashMap<GregorianCalendar, Integer> getShipments() {
+    return shipments;
   }
-  
+
   /**
-  * gets the list of weights for the month
-  * 
-  * @param year
-  * @param month
-  * @return weights for month
-  */
-  public List<Integer> forMonth (int year, int month) {
+   * gets the list of weights within the given range
+   * returns empty list if none within range or if farm is empty
+   *
+   * @param startDate the start date
+   * @param endDate the end date
+   * @return weights in range
+   */
+  public List<Integer> forRange(GregorianCalendar startDate, GregorianCalendar endDate) {
     List<Integer> inRange = new ArrayList<>();
-    Set<GregorianCalendar> allDates = shipments.keySet();
-		
-    for (GregorianCalendar d : allDates) {
-      if (d.get(GregorianCalendar.MONTH) == month && d.get(GregorianCalendar.YEAR) == year) { // checks if in range
-	      inRange.add(shipments.get(d));
-      }
+    GregorianCalendar date = (GregorianCalendar) startDate.clone();
+    while(date.compareTo(endDate) <= 0) {
+      inRange.add(get(date));
+      date.add(Calendar.DAY_OF_MONTH, 1);
     }
-		
     return inRange;
-  }
-  
-  /**
-  * gets the list of weights for the year
-  * 
-  * @param year
-  * @return list for year
-  */
-  public List<Integer> forYear (int year) {
-    List<Integer> inRange = new ArrayList<Integer>();
-    Set<GregorianCalendar> allDates = shipments.keySet();
-		
-    for (GregorianCalendar d : allDates) {
-      if (d.get(GregorianCalendar.YEAR) == year)
-        inRange.add(shipments.get(d));
-    }
-		
-     return inRange;
   }
 }

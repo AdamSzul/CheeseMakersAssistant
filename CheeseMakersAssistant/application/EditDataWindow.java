@@ -88,16 +88,18 @@ public class EditDataWindow extends AssistantWindow{
     HBox top = new HBox(back, sceneTitle);
     HBox bottom = buildCancelSave();
     
-    VBox root = new VBox(top, 
-                         tableID, 
-                         loadStatus,
-                         loadTitle,
-                         table, 
-                         updatePrompt, 
-                         bottom);
+    VBox root = new VBox(
+            top, 
+            tableID, 
+            loadStatus,
+            loadTitle,
+            table, 
+            updatePrompt, 
+            bottom
+    );
     
     top.setSpacing(WINDOW_WIDTH / 3.0);
-    bottom.setSpacing(200);
+    bottom.setSpacing(5.0);
     root.setSpacing(5.0);
     updatePrompt.setSpacing(5.0);
     sceneTitle.setFont(new Font("System Regular", 30));
@@ -141,21 +143,21 @@ public class EditDataWindow extends AssistantWindow{
     
     farmSelect = new ComboBox<>(names);
     farmSelect.setEditable(true);
-    farmSelect.setPromptText("Insert Name");
+    farmSelect.setPromptText("Farm ID");
     farmSelect.valueProperty().addListener(((observable) -> {
       loadTable();
     }));
     
     yearSelect = new ComboBox<>(years);
     yearSelect.setEditable(true);
-    yearSelect.setPromptText("Insert Year");
+    yearSelect.setPromptText("Year");
     yearSelect.setPrefWidth(100);
     yearSelect.valueProperty().addListener(((observable) -> {
       loadTable();
     }));
     
     monthSelect = new ComboBox<>(MONTHS);
-    monthSelect.setPromptText("Choose Month");
+    monthSelect.setPromptText("Month");
     monthSelect.valueProperty().addListener(((observable) -> {
       loadTable();
     }));
@@ -348,7 +350,12 @@ public class EditDataWindow extends AssistantWindow{
       tableChanged = true;
     }
   }
-  
+
+  /**
+   * Show the window
+   * @param stage that the scene will be displayed to.
+   * @param factory the cheese factory
+   */
   @Override
   public void showWindow(Stage stage, CheeseFactory factory) {
     super.showWindow(stage, factory);

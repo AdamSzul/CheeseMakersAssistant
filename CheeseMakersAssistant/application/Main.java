@@ -1,12 +1,9 @@
 package application;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.List;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -58,10 +55,15 @@ public class Main extends Application {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Load File");
       File file = fileChooser.showOpenDialog(primaryStage);
+      
       try {
         factory.read(file);
         AssistantWindow.setNames(factory.getNames());
         AssistantWindow.setYears(factory.getYears());
+        Alert a = new Alert(Alert.AlertType.INFORMATION);
+        a.setTitle("Load Complete");
+        a.setContentText("The file had been loaded.");
+        a.show();
       }catch (Exception e){
         e.printStackTrace();
         Alert a = new Alert(Alert.AlertType.ERROR);

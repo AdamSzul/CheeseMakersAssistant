@@ -19,10 +19,6 @@ public class CheeseFactory {
     years = new ArrayList<>();
   }
 
-  public HashMap<String, Farm> getFarmMap() {
-    return farmMap;
-  }
-
   /**
    * Insert a row into a cheese factory
    * @param farmId the farmId
@@ -58,27 +54,28 @@ public class CheeseFactory {
   public ArrayList<String> getYears() {
     return years;
   }
-  
-  public int getTotalForFarm(String farm, GregorianCalendar startDate, GregorianCalendar endDate) {
-    int total = 0;
-    GregorianCalendar date = (GregorianCalendar) startDate.clone();
-    while(date.compareTo(endDate) <= 0) {
-      total += get(farm, date);
-      date.add(Calendar.DAY_OF_MONTH, 1);
-    }
-    return total;
-  }
-  
+
+  /**
+   * Get the total in a range
+   * @param startDate the start date
+   * @param endDate the end date
+   * @return the total
+   */
   public int getTotal(GregorianCalendar startDate, GregorianCalendar endDate) {
     int total = 0;
     for(String s : getNames()) {
-      total += getTotalForFarm(s, startDate, endDate);
+      total += Stats.sum(getFarm(s).forRange(startDate, endDate));
     }
     if (total == 0)
       total++;
     return total;
   }
 
+  /**
+   * Read from file
+   * @param file the file to read from
+   * @throws Exception if an error occurs
+   */
   public void read(File file) throws Exception {
     Scanner scanner = new Scanner(file);
     String line = scanner.nextLine();
@@ -129,7 +126,7 @@ public class CheeseFactory {
     for(Map.Entry<String, Farm> farmEntry : farmMap.entrySet()) {
       String farmId = farmEntry.getKey();
       Farm farm = farmEntry.getValue();
-      for(Map.Entry<GregorianCalendar, Integer> weightEntry : farm.shipments.entrySet()){
+      for(Map.Entry<GregorianCalendar, Integer> weightEntry : farm.getShipments().entrySet()){
         GregorianCalendar date = weightEntry.getKey();
         int weight = weightEntry.getValue();
         String dateString = date.get(Calendar.YEAR) + "-" + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DAY_OF_MONTH);
@@ -142,5 +139,9 @@ public class CheeseFactory {
       }
     }
     writer.close();
+  }
+  
+  public Farm getFarm(String key){
+    return farmMap.get(key);
   }
 }

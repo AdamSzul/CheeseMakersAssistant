@@ -19,6 +19,8 @@ import java.time.Month;
 import java.time.YearMonth;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -123,7 +125,6 @@ public class DurationReport extends AssistantWindow{
     loadTitle.textProperty().bind(tableTitle);
     
     group.selectedToggleProperty().addListener((observable, oldVal, newVal) -> {
-      loadData();  
       switch (((RadioButton)newVal).getText()){
           case "Yearly":
             monthHBox.setVisible(false);
@@ -147,11 +148,11 @@ public class DurationReport extends AssistantWindow{
             report = Report.RANGE;
             break;
         }
+      loadData();
     });
     
     Button saveToFile = new Button("Save to File");
     saveToFile.setOnAction(actionEvent -> {
-      LinkedList<String[]> printList = new LinkedList<String[]>();
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Save File");
       File file = fileChooser.showSaveDialog(stage);
@@ -253,7 +254,7 @@ public class DurationReport extends AssistantWindow{
           }
         }
         
-        tableTitle.set(String.format("Date Range Report from %d/%d/%d to %d/%d/%d", 
+        tableTitle.set(String.format("Date Range Report from %d/%d/%d to %d/%d/%d" , 
                                   startDay, startMonth.getValue(), startYear, 
                                   endDay, endMonth.getValue(), endYear));
         break;
@@ -293,10 +294,13 @@ public class DurationReport extends AssistantWindow{
     list.clear();
     int total = factory.getTotal(start, end);
     for(String s : names) {
-      int farmTotal = factory.getTotalForFarm(s, start, end);
+      int farmTotal = Stats.sum(factory.getFarm(s).forRange(start, end));
       list.add(new Row(s, farmTotal, 100 * farmTotal / total));
     }
     loadMsg.set("Data loaded");
+    List<Integer> weights = list.stream().map(x -> x.getWeight()).collect(Collectors.toList());
+    String statsString = "Min: " + Stats.min(weights) + ", Avg: " + Stats.avg(weights) + ", Max: " + Stats.max(weights);
+    tableTitle.set(tableTitle.get() + " | " + statsString);
     table.refresh();
   }
   

@@ -6,7 +6,8 @@ import java.io.IOException;
 import java.time.Month;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -69,7 +70,6 @@ public class FarmReport extends AssistantWindow{
     
     Button saveToFile = new Button("Save to File");
     saveToFile.setOnAction(actionEvent -> {
-      LinkedList<String[]> printList = new LinkedList<String[]>();
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Save File");
       File file = fileChooser.showSaveDialog(stage);
@@ -119,10 +119,10 @@ public class FarmReport extends AssistantWindow{
     TableColumn<Row, String> monthCol = new TableColumn<Row, String>("Month");
     monthCol.setCellValueFactory(new PropertyValueFactory<>("rowName"));
     
-    TableColumn<Row, Integer> totalWeightCol = new TableColumn<Row, Integer>("Total Weight");
+    TableColumn<Row, Integer> totalWeightCol = new TableColumn<Row, Integer>("Weight");
     totalWeightCol.setCellValueFactory(new PropertyValueFactory<>("weight"));
     
-    TableColumn<Row, Integer> percentWeightCol = new TableColumn<Row, Integer>("Percent Weight");
+    TableColumn<Row, Integer> percentWeightCol = new TableColumn<Row, Integer>("Percent");
     percentWeightCol.setCellValueFactory(new PropertyValueFactory<>("rowValue"));
     
     table.setItems(list);
@@ -133,21 +133,23 @@ public class FarmReport extends AssistantWindow{
   }
   
   private HBox buildTableID() {
-    farmSelect = new ComboBox<String>(names);
-    farmSelect.setPromptText("Insert Name");
+    farmSelect = new ComboBox<>(names);
+    farmSelect.setPromptText("Name");
     farmSelect.valueProperty().addListener(observable -> {
       loadData();
     });
-    yearSelect = new ComboBox<String>(years);
-    yearSelect.setPromptText("Insert Year");
+    yearSelect = new ComboBox<>(years);
+    yearSelect.setPromptText("Year");
     yearSelect.setPrefWidth(100);
     yearSelect.valueProperty().addListener(observable -> {
       loadData();
     });
 
     
-    return new HBox(new VBox(new Label("Farm ID"), farmSelect), 
-                    new VBox(new Label("Year"), yearSelect));
+    return new HBox(
+            new VBox(new Label("Farm ID"), farmSelect), 
+            new VBox(new Label("Year"), yearSelect)
+    );
   }
   
   /**
@@ -171,17 +173,19 @@ public class FarmReport extends AssistantWindow{
     }
     list.clear();
     
-    //Simulates loading data into list.
+    // Simulates loading data into list
     for(Month m : MONTHS) {
       GregorianCalendar startDate = new GregorianCalendar(year, m.getValue() - 1, 1);
       GregorianCalendar endDate = (GregorianCalendar) startDate.clone();
       endDate.roll(Calendar.DAY_OF_MONTH, -1);
-      int total = factory.getTotalForFarm(farm, startDate, endDate);
-      list.add(new Row(m, total, 100 * total / factory.getTotal(startDate, endDate)));
+      int total = Stats.sum(factory.getFarm(farm).forRange(startDate, endDate));
+      list.add(new Row(m.toString().substring(0, 3), total, 100 * total / factory.getTotal(startDate, endDate)));
     }
     table.refresh();
     loadMsg.set("Data loaded");
-    tableTitle.set(farm + ", " + year);
+    List<Integer> weights = list.stream().map(x -> x.getWeight()).collect(Collectors.toList());
+    String statsString = "Min: " + Stats.min(weights) + ", Avg: " + Stats.avg(weights) + ", Max: " + Stats.max(weights);
+    tableTitle.set(farm + ", " + year + " | " + statsString);
   }
   
   @Override
