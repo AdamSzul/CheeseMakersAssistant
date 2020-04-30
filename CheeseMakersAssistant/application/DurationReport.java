@@ -23,11 +23,15 @@ import java.util.stream.Collectors;
 
 /**
  * The duration report
+ *
  * @authors Michael, Adam
  */
-public class DurationReport extends AssistantWindow{
+public class DurationReport extends AssistantWindow {
 
-  enum Report {YEAR, MONTH, RANGE};
+  Report report = Report.RANGE;
+
+  SimpleStringProperty loadMsg;
+  SimpleStringProperty tableTitle;
   private TableView<Row> table;
   private ObservableList<Row> list;
   private ChoiceBox<String> yearChoiceBox;
@@ -36,24 +40,21 @@ public class DurationReport extends AssistantWindow{
   private ChoiceBox<Month> endMonthChoiceBox;
   private TextField dayStart;
   private TextField dayEnd;
-  Report report = Report.RANGE;
-  SimpleStringProperty loadMsg;
-  SimpleStringProperty tableTitle;
-
   /**
    * Create duration report
+   *
    * @param stage the stage
    */
-  DurationReport(Stage stage){
-    
+  DurationReport(Stage stage) {
+
     list = FXCollections.observableArrayList();
 
     Button backButton = new Button("Back");
     backButton.setOnAction(actionEvent -> {
       stage.setScene(old);
     });
-    
-    
+
+
     Label title = new Label("Duration Report");
     title.setFont(new Font("System Regular", 30));
     HBox top = new HBox(backButton, title);
@@ -70,9 +71,9 @@ public class DurationReport extends AssistantWindow{
     rb3.setToggleGroup(group);
     rb3.setSelected(true);
 
-    
+
     HBox radioHBox = new HBox(rb1, rb2, rb3);
-    
+
     yearChoiceBox = new ChoiceBox<String>(years);
     yearChoiceBox.valueProperty().addListener(observable -> {
       loadData();
@@ -88,9 +89,9 @@ public class DurationReport extends AssistantWindow{
     dayStart.textProperty().addListener(observable -> {
       loadData();
     });
-    
+
     HBox dayHBox = new HBox(new Label("Day"), dayStart);
-    
+
     dayEnd = new TextField();
     dayEnd.setPrefWidth(40.0);
     dayEnd.textProperty().addListener(observable -> {
@@ -103,55 +104,55 @@ public class DurationReport extends AssistantWindow{
       loadData();
     });
     HBox endYearHBox = new HBox(new Label("Year"), endYearChoiceBox);
-    
+
     endMonthChoiceBox = new ChoiceBox<Month>(MONTHS);
     endMonthChoiceBox.valueProperty().addListener(observable -> {
       loadData();
     });
     HBox endMonthHBox = new HBox(new Label("Month"), endMonthChoiceBox);
-    
+
     buildTable();
-    
+
     Label startLabel = new Label("Start");
     Label endLabel = new Label("End");
     VBox startVBox = new VBox(startLabel, yearHBox, monthHBox, dayHBox);
     VBox endVBox = new VBox(endLabel, endYearHBox, endMonthHBox, endDayHBox);
-    
+
     Label loadStatus = new Label();
     loadMsg = new SimpleStringProperty();
     loadStatus.textProperty().bind(loadMsg);
-    
+
     Label loadTitle = new Label();
     tableTitle = new SimpleStringProperty();
     loadTitle.textProperty().bind(tableTitle);
-    
+
     group.selectedToggleProperty().addListener((observable, oldVal, newVal) -> {
-      switch (((RadioButton)newVal).getText()){
-          case "Yearly":
-            monthHBox.setVisible(false);
-            startLabel.setVisible(false);
-            dayHBox.setVisible(false);
-            endVBox.setVisible(false);
-            report = Report.YEAR;
-            break;
-          case "Monthly":
-            monthHBox.setVisible(true);
-            startLabel.setVisible(false);
-            dayHBox.setVisible(false);
-            endVBox.setVisible(false);
-            report = Report.MONTH;
-            break;
-          case "Date Range":
-            monthHBox.setVisible(true);
-            startLabel.setVisible(true);
-            dayHBox.setVisible(true);
-            endVBox.setVisible(true);
-            report = Report.RANGE;
-            break;
-        }
+      switch (((RadioButton) newVal).getText()) {
+        case "Yearly":
+          monthHBox.setVisible(false);
+          startLabel.setVisible(false);
+          dayHBox.setVisible(false);
+          endVBox.setVisible(false);
+          report = Report.YEAR;
+          break;
+        case "Monthly":
+          monthHBox.setVisible(true);
+          startLabel.setVisible(false);
+          dayHBox.setVisible(false);
+          endVBox.setVisible(false);
+          report = Report.MONTH;
+          break;
+        case "Date Range":
+          monthHBox.setVisible(true);
+          startLabel.setVisible(true);
+          dayHBox.setVisible(true);
+          endVBox.setVisible(true);
+          report = Report.RANGE;
+          break;
+      }
       loadData();
     });
-    
+
     Button saveToFile = new Button("Save to File");
     saveToFile.setOnAction(actionEvent -> {
       FileChooser fileChooser = new FileChooser();
@@ -165,7 +166,7 @@ public class DurationReport extends AssistantWindow{
         }
       }
     });
-    
+
     VBox vbox = new VBox(
             radioHBox,
             new HBox(startVBox, endVBox),
@@ -173,27 +174,27 @@ public class DurationReport extends AssistantWindow{
             loadTitle,
             table
     );
-    scene = new Scene(new VBox(top, vbox, saveToFile), WINDOW_WIDTH, WINDOW_HEIGHT);  
+    scene = new Scene(new VBox(top, vbox, saveToFile), WINDOW_WIDTH, WINDOW_HEIGHT);
   }
 
   /**
    * Construct the table
    */
   private void buildTable() {
-    
+
     table = new TableView<Row>();
-    
+
     TableColumn<Row, String> farmIdCol = new TableColumn<Row, String>("Farm ID");
     farmIdCol.setCellValueFactory(new PropertyValueFactory<>("rowName"));
     TableColumn<Row, Integer> totalWeightCol = new TableColumn<Row, Integer>("Weight");
     totalWeightCol.setCellValueFactory(new PropertyValueFactory<>("weight"));
     TableColumn<Row, Integer> percentWeightCol = new TableColumn<Row, Integer>("Percent");
     percentWeightCol.setCellValueFactory(new PropertyValueFactory<>("rowValue"));
-    
+
     table.getColumns().add(farmIdCol);
     table.getColumns().add(totalWeightCol);
     table.getColumns().add(percentWeightCol);
-    
+
     table.setItems(list);
   }
 
@@ -228,22 +229,22 @@ public class DurationReport extends AssistantWindow{
         }
         startDate = YearMonth.of(startYear, startMonth.getValue());
         endDate = YearMonth.of(endYear, endMonth.getValue());
-        
+
         if (startDay <= 0 || endDay <= 0) {
           loadMsg.set("Days must be positive integers");
           return;
         }
-        
+
         if (startDay > startDate.lengthOfMonth()) {
           loadMsg.set("Start day cannot be greater than " + startDate.lengthOfMonth());
           return;
         }
-        
+
         if (endDay > endDate.lengthOfMonth()) {
           loadMsg.set("End day cannot be greater than " + endDate.lengthOfMonth());
           return;
         }
-        
+
         if (endYear < startYear) {
           loadMsg.set("End date must not come before start date");
           return;
@@ -260,12 +261,12 @@ public class DurationReport extends AssistantWindow{
             }
           }
         }
-        
-        tableTitle.set(String.format("Date Range Report from %d/%d/%d to %d/%d/%d" , 
-                                  startDay, startMonth.getValue(), startYear, 
-                                  endDay, endMonth.getValue(), endYear));
+
+        tableTitle.set(String.format("Date Range Report from %d/%d/%d to %d/%d/%d",
+                startDay, startMonth.getValue(), startYear,
+                endDay, endMonth.getValue(), endYear));
         break;
-        
+
       case MONTH:
         try {
           startYear = Integer.parseInt(yearChoiceBox.getValue());
@@ -273,7 +274,7 @@ public class DurationReport extends AssistantWindow{
         } catch (NumberFormatException e) {
           loadMsg.set("Year must be an integer");
           return;
-        } 
+        }
         startMonth = monthChoiceBox.getValue();
         if (startMonth == null) {
           loadMsg.set("Must select a month");
@@ -284,7 +285,7 @@ public class DurationReport extends AssistantWindow{
         endDay = endDate.lengthOfMonth();
         tableTitle.set("Monthly Report for " + startMonth + " " + startYear);
         break;
-        
+
       case YEAR:
         try {
           startYear = Integer.parseInt(yearChoiceBox.getValue());
@@ -295,12 +296,12 @@ public class DurationReport extends AssistantWindow{
         }
         tableTitle.set("Yearly Report for " + startYear);
     }
-    
-    GregorianCalendar start = new GregorianCalendar(startYear,startMonth.getValue() - 1,startDay);
-    GregorianCalendar end = new GregorianCalendar(endYear,endMonth.getValue() - 1,endDay);
+
+    GregorianCalendar start = new GregorianCalendar(startYear, startMonth.getValue() - 1, startDay);
+    GregorianCalendar end = new GregorianCalendar(endYear, endMonth.getValue() - 1, endDay);
     list.clear();
     int total = factory.getTotal(start, end);
-    for(String s : names) {
+    for (String s : names) {
       int farmTotal = Stats.sum(factory.getFarm(s).forRange(start, end));
       list.add(new Row(s, farmTotal, 100 * farmTotal / total));
     }
@@ -313,7 +314,8 @@ public class DurationReport extends AssistantWindow{
 
   /**
    * Show the window
-   * @param stage that the scene will be displayed to.
+   *
+   * @param stage   that the scene will be displayed to.
    * @param factory the factory
    */
   @Override
@@ -322,5 +324,7 @@ public class DurationReport extends AssistantWindow{
     yearChoiceBox.setItems(years);
     endYearChoiceBox.setItems(years);
   }
+
+  enum Report {YEAR, MONTH, RANGE}
 }
 

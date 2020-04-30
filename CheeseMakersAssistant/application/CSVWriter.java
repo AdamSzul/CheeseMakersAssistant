@@ -14,6 +14,7 @@ public class CSVWriter {
 
   /**
    * Create CSVWriter
+   *
    * @param file file to write to
    * @throws FileNotFoundException if the file is not found
    */
@@ -23,16 +24,17 @@ public class CSVWriter {
 
   /**
    * Write a row
+   *
    * @param row the row to write
    */
-  public void writeRow(String[] row){
+  public void writeRow(String[] row) {
     writer.println(Stream.of(row).collect(Collectors.joining(",")));
   }
 
   /**
    * Close the writer
    */
-  public void close(){
+  public void close() {
     writer.close();
   }
 }

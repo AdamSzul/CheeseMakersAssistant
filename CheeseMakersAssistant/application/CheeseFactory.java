@@ -21,8 +21,9 @@ public class CheeseFactory {
 
   /**
    * Insert a row into a cheese factory
+   *
    * @param farmId the farmId
-   * @param date the date
+   * @param date   the date
    * @param weight the weight
    */
   public void insert(String farmId, GregorianCalendar date, int weight) {
@@ -30,8 +31,7 @@ public class CheeseFactory {
       Farm farm = new Farm();
       farm.insert(date, weight);
       farmMap.put(farmId, farm);
-    }
-    else {
+    } else {
       farmMap.get(farmId).insert(date, weight);
     }
     String year = Integer.toString(date.get(Calendar.YEAR));
@@ -42,6 +42,7 @@ public class CheeseFactory {
 
   /**
    * Get the names
+   *
    * @return the names
    */
   public ArrayList<String> getNames() {
@@ -50,6 +51,7 @@ public class CheeseFactory {
 
   /**
    * Get the years
+   *
    * @return the years
    */
   public ArrayList<String> getYears() {
@@ -58,13 +60,14 @@ public class CheeseFactory {
 
   /**
    * Get the total in a range
+   *
    * @param startDate the start date
-   * @param endDate the end date
+   * @param endDate   the end date
    * @return the total
    */
   public int getTotal(GregorianCalendar startDate, GregorianCalendar endDate) {
     int total = 0;
-    for(String s : getNames()) {
+    for (String s : getNames()) {
       total += Stats.sum(getFarm(s).forRange(startDate, endDate));
     }
     if (total == 0)
@@ -74,6 +77,7 @@ public class CheeseFactory {
 
   /**
    * Read from file
+   *
    * @param file the file to read from
    * @throws Exception if an error occurs
    */
@@ -84,18 +88,25 @@ public class CheeseFactory {
     int farmIdIndex = -1;
     int dateIndex = -1;
     int weightIndex = -1;
-    for(int i = 0; i < names.length; i++){
-      switch (names[i]){
-        case "date": dateIndex = i; break;
-        case "farm_id": farmIdIndex = i; break;
-        case "weight": weightIndex = i; break;
-        default: break;
+    for (int i = 0; i < names.length; i++) {
+      switch (names[i]) {
+        case "date":
+          dateIndex = i;
+          break;
+        case "farm_id":
+          farmIdIndex = i;
+          break;
+        case "weight":
+          weightIndex = i;
+          break;
+        default:
+          break;
       }
     }
-    if(farmIdIndex == -1 || dateIndex == -1 || weightIndex == -1){
+    if (farmIdIndex == -1 || dateIndex == -1 || weightIndex == -1) {
       throw new Exception("Required columns not present");
     }
-    while(scanner.hasNext()) {
+    while (scanner.hasNext()) {
       line = scanner.nextLine();
       String[] data = line.split(",");
       String farmId = data[farmIdIndex];
@@ -114,6 +125,7 @@ public class CheeseFactory {
 
   /**
    * Write the data to a file
+   *
    * @param file the file to write to
    * @throws IOException if the file can not be written to
    */
@@ -124,10 +136,10 @@ public class CheeseFactory {
             "date",
             "weight"
     });
-    for(Map.Entry<String, Farm> farmEntry : farmMap.entrySet()) {
+    for (Map.Entry<String, Farm> farmEntry : farmMap.entrySet()) {
       String farmId = farmEntry.getKey();
       Farm farm = farmEntry.getValue();
-      for(Map.Entry<GregorianCalendar, Integer> weightEntry : farm.getShipments().entrySet()){
+      for (Map.Entry<GregorianCalendar, Integer> weightEntry : farm.getShipments().entrySet()) {
         GregorianCalendar date = weightEntry.getKey();
         int weight = weightEntry.getValue();
         String dateString = date.get(Calendar.YEAR) + "-" + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DAY_OF_MONTH);
@@ -141,8 +153,8 @@ public class CheeseFactory {
     }
     writer.close();
   }
-  
-  public Farm getFarm(String key){
+
+  public Farm getFarm(String key) {
     return farmMap.get(key);
   }
 }
