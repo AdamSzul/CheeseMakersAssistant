@@ -15,4 +15,9 @@ Which team members were on same xteam together?
 Adam Szulczewski and Anand Shatdal
 
 Other notes or comments to the grader:
-Anson Doan and Anand Shatdal did not contribute to a2.
+Anson Doan and Anand Shatdal did not contribute to a2 or a3.
+
+Future Work:
+Allow the user to graph the data
+Add more statistics including IQR
+Attempt to predict future values
