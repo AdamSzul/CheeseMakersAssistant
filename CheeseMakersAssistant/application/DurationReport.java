@@ -17,7 +17,6 @@ import java.time.Month;
 import java.time.YearMonth;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 /**
@@ -48,6 +47,8 @@ public class DurationReport extends AssistantWindow {
 
     list = FXCollections.observableArrayList();
 
+    // setup ui
+    
     Button backButton = new Button("Back");
     backButton.setOnAction(actionEvent -> {
       stage.setScene(old);
@@ -125,6 +126,7 @@ public class DurationReport extends AssistantWindow {
     tableTitle = new SimpleStringProperty();
     loadTitle.textProperty().bind(tableTitle);
 
+    // handle visibility of the inputs depending on the type
     group.selectedToggleProperty().addListener((observable, oldVal, newVal) -> {
       switch (((RadioButton) newVal).getText()) {
         case "Yearly":
@@ -152,6 +154,7 @@ public class DurationReport extends AssistantWindow {
       loadData();
     });
 
+    // save to file
     Button saveToFile = new Button("Save to File");
     saveToFile.setOnAction(actionEvent -> {
       FileChooser fileChooser = new FileChooser();
@@ -191,7 +194,7 @@ public class DurationReport extends AssistantWindow {
         }
       }
     });
-
+    
     VBox vbox = new VBox(
             radioHBox,
             new HBox(startVBox, endVBox),
@@ -199,6 +202,8 @@ public class DurationReport extends AssistantWindow {
             loadTitle,
             table
     );
+    
+    // setup the scene
     scene = new Scene(new VBox(top, vbox, saveToFile), WINDOW_WIDTH, WINDOW_HEIGHT);
   }
 
