@@ -13,7 +13,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.Month;
 import java.time.YearMonth;
 import java.util.GregorianCalendar;
@@ -40,6 +39,7 @@ public class DurationReport extends AssistantWindow {
   private ChoiceBox<Month> endMonthChoiceBox;
   private TextField dayStart;
   private TextField dayEnd;
+
   /**
    * Create duration report
    *
@@ -159,11 +159,11 @@ public class DurationReport extends AssistantWindow {
       fileChooser.setTitle("Save File");
       File file = fileChooser.showSaveDialog(stage);
       if (file != null) {
-        try {
-          factory.write(file);
+        /*try {
+          factory.write(file); // FIX this
         } catch (IOException e) {
           e.printStackTrace();
-        }
+        }*/
       }
     });
 

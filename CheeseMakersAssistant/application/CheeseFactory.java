@@ -46,7 +46,9 @@ public class CheeseFactory {
    * @return the names
    */
   public ArrayList<String> getNames() {
-    return new ArrayList(farmMap.keySet());
+    ArrayList<String> list = new ArrayList(farmMap.keySet());
+    Collections.sort(list);
+    return list;
   }
 
   /**
@@ -129,7 +131,7 @@ public class CheeseFactory {
    * @param file the file to write to
    * @throws IOException if the file can not be written to
    */
-  public void write(File file) throws IOException {
+  public void write(GregorianCalendar date, File file) throws IOException {
     CSVWriter writer = new CSVWriter(file);
     writer.writeRow(new String[]{
             "farm_id",
@@ -139,9 +141,8 @@ public class CheeseFactory {
     for (Map.Entry<String, Farm> farmEntry : farmMap.entrySet()) {
       String farmId = farmEntry.getKey();
       Farm farm = farmEntry.getValue();
-      for (Map.Entry<GregorianCalendar, Integer> weightEntry : farm.getShipments().entrySet()) {
-        GregorianCalendar date = weightEntry.getKey();
-        int weight = weightEntry.getValue();
+      for (int i = date.getMaximum(Calendar.DAY_OF_MONTH); i > 0; i--) {
+        int weight = farm.get(date);
         String dateString = date.get(Calendar.YEAR) + "-" + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DAY_OF_MONTH);
         String weightString = String.valueOf(weight);
         writer.writeRow(new String[]{
@@ -149,6 +150,7 @@ public class CheeseFactory {
                 dateString,
                 weightString
         });
+        date.roll(Calendar.DAY_OF_MONTH, 1);
       }
     }
     writer.close();

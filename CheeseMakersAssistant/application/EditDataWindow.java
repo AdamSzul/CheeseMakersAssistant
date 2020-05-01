@@ -276,10 +276,12 @@ public class EditDataWindow extends AssistantWindow {
       updateMsg.set("Table saved");
       tableChanged = false;
     });
+
     Button saveToFile = new Button("Save to File");
     saveToFile.setOnAction(actionEvent -> {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Save File");
+      fileChooser.setInitialFileName(date.get(Calendar.YEAR) + "-" + (date.get(Calendar.MONTH) + 1) + ".csv");
       File file = fileChooser.showSaveDialog(stage);
       if (file != null) {
         if (tableChanged) {
@@ -294,7 +296,7 @@ public class EditDataWindow extends AssistantWindow {
         }
 
         try {
-          factory.write(file);
+          factory.write(date, file);
         } catch (IOException e) {
           e.printStackTrace();
         }
