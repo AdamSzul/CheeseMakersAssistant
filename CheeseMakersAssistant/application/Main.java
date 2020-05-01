@@ -68,6 +68,8 @@ public class Main extends Application {
         return;
       }
       try {
+        //Reads data from file
+        
         factory.read(file);
         AssistantWindow.setNames(factory.getNames());
         AssistantWindow.setYears(factory.getYears());
@@ -138,6 +140,7 @@ public class Main extends Application {
     }
     vbox.setSpacing(1);
 
+    //Formats the window
     Scene mainScene = new Scene(vbox, WINDOW_WIDTH, WINDOW_HEIGHT);
     vbox.setAlignment(Pos.CENTER);
     title.setAlignment(Pos.CENTER);

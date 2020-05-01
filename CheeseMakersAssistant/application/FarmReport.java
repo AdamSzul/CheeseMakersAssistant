@@ -68,6 +68,8 @@ public class FarmReport extends AssistantWindow {
       fileChooser.setTitle("Save File");
       File file = fileChooser.showSaveDialog(stage);
       if (file != null) {
+        
+        //Prints table contents to file
         try {
           CSVWriter writer = new CSVWriter(file);
           writer.writeRow(new String[]{
@@ -111,6 +113,7 @@ public class FarmReport extends AssistantWindow {
             saveToFile
     );
 
+    //Formats the Window
     root.setSpacing(5.0);
     top.setSpacing(WINDOW_WIDTH / 3.0);
     sceneTitle.setFont(new Font("System Regular", 30));
@@ -119,6 +122,9 @@ public class FarmReport extends AssistantWindow {
 
   }
 
+  /**
+   * Method that assembles the table for this window
+   */
   private void buildTable() {
     table = new TableView<Row>();
 
