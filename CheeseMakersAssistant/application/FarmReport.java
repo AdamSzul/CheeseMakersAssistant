@@ -192,9 +192,9 @@ public class FarmReport extends AssistantWindow {
 
       List<Integer> range = factory.getFarm(farm).forRange(startDate, endDate);
       int total = Stats.sum(range);
-      int min = Stats.min(range.stream().map(x -> x).collect(Collectors.toList()));
-      int max = Stats.max(range.stream().map(x -> x).collect(Collectors.toList()));
-      int avg = Stats.avg(range.stream().map(x -> x).collect(Collectors.toList()));
+      int min = Stats.min(range);
+      int max = Stats.max(range);
+      int avg = Stats.avg(range);
 
       list.add(new Row(
               m.toString().substring(0, 3),
@@ -203,9 +203,6 @@ public class FarmReport extends AssistantWindow {
     }
     table.refresh();
     loadMsg.set("Data loaded");
-    List<Integer> weights = list.stream().map(x -> x.getWeight()).collect(Collectors.toList());
-    String statsString = "Min: " + Stats.min(weights) + ", Avg: " + Stats.avg(weights) + ", Max: " + Stats.max(weights);
-    tableTitle.set(farm + ", " + year + " | " + statsString);
   }
 
   /**

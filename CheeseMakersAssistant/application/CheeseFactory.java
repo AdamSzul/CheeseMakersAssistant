@@ -114,12 +114,21 @@ public class CheeseFactory {
       String farmId = data[farmIdIndex];
       String dataString = data[dateIndex];
       String[] dateParts = dataString.split("-");
+      int day = Integer.parseInt(dateParts[2]);
+      int month = Integer.parseInt(dateParts[1]) - 1;
+      if (month < 0 || month > 12)
+        throw new Exception("Invalid month in file");
+      int year = Integer.parseInt(dateParts[0]);
       GregorianCalendar date = new GregorianCalendar(
-              Integer.parseInt(dateParts[0]),
-              Integer.parseInt(dateParts[1]) - 1,
-              Integer.parseInt(dateParts[2])
+              year,
+              month,
+              day
       );
+      if (date.get(Calendar.DAY_OF_MONTH) != day)
+        throw new Exception("Invalid day in file");
       int weight = Integer.parseInt(data[weightIndex]);
+      if (weight < 0)
+        throw new Exception("Weight cannot be negative");
       insert(farmId, date, weight);
     }
     scanner.close();

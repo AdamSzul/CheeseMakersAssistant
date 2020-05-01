@@ -358,16 +358,13 @@ public class DurationReport extends AssistantWindow {
     for (String s : names) {
       List<Integer> range = factory.getFarm(s).forRange(start, end);
       int farmTotal = Stats.sum(range);
-      int min = Stats.min(range.stream().map(x -> x).collect(Collectors.toList()));
-      int max = Stats.max(range.stream().map(x -> x).collect(Collectors.toList()));
-      int avg = Stats.avg(range.stream().map(x -> x).collect(Collectors.toList()));
+      int min = Stats.min(range);
+      int max = Stats.max(range);
+      int avg = Stats.avg(range);
       list.add(new Row(s, farmTotal, 100 * farmTotal / total, min, max, avg));
     }
 
     loadMsg.set("Data loaded");
-    List<Integer> weights = list.stream().map(x -> x.getWeight()).collect(Collectors.toList());
-    String statsString = "Min: " + Stats.min(weights) + ", Avg: " + Stats.avg(weights) + ", Max: " + Stats.max(weights);
-    tableTitle.set(tableTitle.get() + " | " + statsString);
     table.refresh();
   }
 

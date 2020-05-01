@@ -2,6 +2,7 @@ package application;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -72,10 +73,9 @@ public class Main extends Application {
         AssistantWindow.setYears(factory.getYears());
         Alert a = new Alert(Alert.AlertType.INFORMATION);
         a.setTitle("Load Complete");
-        a.setContentText("The file had been loaded.");
+        a.setContentText("The file has been loaded.");
         a.show();
       } catch (Exception e) {
-        e.printStackTrace();
         Alert a = new Alert(Alert.AlertType.ERROR);
         a.setTitle("Error while Loading File");
         a.setContentText(e.getMessage());
@@ -139,6 +139,8 @@ public class Main extends Application {
     vbox.setSpacing(1);
 
     Scene mainScene = new Scene(vbox, WINDOW_WIDTH, WINDOW_HEIGHT);
+    vbox.setAlignment(Pos.CENTER);
+    title.setAlignment(Pos.CENTER);
 
     primaryStage.setTitle(APP_TITLE);
     primaryStage.setScene(mainScene);
