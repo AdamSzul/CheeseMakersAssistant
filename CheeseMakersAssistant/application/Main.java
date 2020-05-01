@@ -105,7 +105,6 @@ public class Main extends Application {
         a.setContentText("The folder had been loaded.");
         a.show();
       } catch (Exception e) {
-        e.printStackTrace();
         Alert a = new Alert(Alert.AlertType.ERROR);
         a.setTitle("Error while Loading Folder");
         a.setContentText(e.getMessage());

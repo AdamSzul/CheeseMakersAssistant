@@ -31,27 +31,28 @@ public abstract class AssistantWindow {
   protected CheeseFactory factory;
 
   /**
-   * Set the names
+   * Method that will store the Farm names for each window to use
    *
-   * @param names the names
+   * @param names
    */
   static void setNames(ArrayList<String> names) {
     AssistantWindow.names = FXCollections.observableArrayList(names);
   }
 
   /**
-   * Set teh years
+   * Method that will store the years for each window to use
    *
-   * @param years the years
+   * @param years
    */
   static void setYears(ArrayList<String> years) {
     AssistantWindow.years = FXCollections.observableArrayList(years);
   }
 
   /**
-   * Method that will allow this scene to be displayed.
+   * Method that will allow this window to be displayed.
    *
-   * @param stage that the scene will be displayed to.
+   * @param stage   that the scene will be displayed to.
+   * @param factory Reference to the CheeseFactory used by this program
    */
   public void showWindow(Stage stage, CheeseFactory factory) {
     this.factory = factory;
@@ -69,6 +70,9 @@ public abstract class AssistantWindow {
     SimpleIntegerProperty rowValue;
     SimpleStringProperty rowName;
     SimpleIntegerProperty weight;
+    SimpleIntegerProperty min;
+    SimpleIntegerProperty max;
+    SimpleIntegerProperty avg;
 
     /**
      * Constructor for rows of the Edit Data table
@@ -87,11 +91,18 @@ public abstract class AssistantWindow {
      * @param month
      * @param weight
      * @param percentWeight
+     * @param min
+     * @param max
+     * @param avg
      */
-    public Row(Month month, int weight, int percentWeight) {
+    public Row(Month month, int weight, int percentWeight,
+               int min, int max, int avg) {
       this.rowName = new SimpleStringProperty(month.toString());
       this.weight = new SimpleIntegerProperty(weight);
       this.rowValue = new SimpleIntegerProperty(percentWeight);
+      this.rowValue = new SimpleIntegerProperty(min);
+      this.rowValue = new SimpleIntegerProperty(max);
+      this.rowValue = new SimpleIntegerProperty(avg);
     }
 
     /**
@@ -100,39 +111,46 @@ public abstract class AssistantWindow {
      * @param farmId
      * @param totalWeight
      * @param percentWeight
+     * @param min
+     * @param max
+     * @param avg
      */
-    public Row(String farmId, int totalWeight, int percentWeight) {
+    public Row(String farmId, int totalWeight, int percentWeight,
+               int min, int max, int avg) {
       this.rowName = new SimpleStringProperty(farmId);
       this.weight = new SimpleIntegerProperty(totalWeight);
       this.rowValue = new SimpleIntegerProperty(percentWeight);
+      this.min = new SimpleIntegerProperty(min);
+      this.max = new SimpleIntegerProperty(max);
+      this.avg = new SimpleIntegerProperty(avg);
     }
 
-    /**
-     * Get the row value
-     *
-     * @return the row value
-     */
     public int getRowValue() {
       return rowValue.get();
     }
 
-    /**
-     * Get the weight
-     *
-     * @return the weight
-     */
     public int getWeight() {
       return weight.get();
     }
 
-    /**
-     * The row name
-     *
-     * @return the name
-     */
+    public void setWeight(int newWeight) {
+      this.weight.set(newWeight);
+    }
+
     public String getRowName() {
       return rowName.get();
     }
 
+    public int getMin() {
+      return min.get();
+    }
+
+    public int getMax() {
+      return max.get();
+    }
+
+    public int getAvg() {
+      return avg.get();
+    }
   }
 }

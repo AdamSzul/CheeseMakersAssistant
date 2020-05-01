@@ -13,7 +13,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.time.Month;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -69,24 +68,36 @@ public class FarmReport extends AssistantWindow {
       fileChooser.setTitle("Save File");
       File file = fileChooser.showSaveDialog(stage);
       if (file != null) {
-        CSVWriter writer = null;
         try {
-          writer = new CSVWriter(file);
+          CSVWriter writer = new CSVWriter(file);
           writer.writeRow(new String[]{
                   "month",
                   "weight",
-                  "percent"
+                  "percent",
+                  "min",
+                  "max",
+                  "avg"
           });
           for (Row row : list) {
             writer.writeRow(new String[]{
                     row.getRowName(),
                     Integer.toString(row.getWeight()),
-                    Integer.toString(row.getRowValue())
+                    Integer.toString(row.getRowValue()),
+                    Integer.toString(row.getMin()),
+                    Integer.toString(row.getMax()),
+                    Integer.toString(row.getAvg())
             });
           }
           writer.close();
-        } catch (FileNotFoundException e) {
-          e.printStackTrace();
+          Alert a = new Alert(Alert.AlertType.INFORMATION);
+          a.setTitle("Save Complete");
+          a.setContentText("The file has been saved.");
+          a.show();
+        } catch (Exception e) {
+          Alert a = new Alert(Alert.AlertType.ERROR);
+          a.setTitle("Error while saving file");
+          a.setContentText(e.getMessage());
+          a.show();
         }
       }
     });
@@ -108,9 +119,6 @@ public class FarmReport extends AssistantWindow {
 
   }
 
-  /**
-   * Build the table
-   */
   private void buildTable() {
     table = new TableView<Row>();
 
@@ -122,12 +130,16 @@ public class FarmReport extends AssistantWindow {
 
     TableColumn<Row, Integer> percentWeightCol = new TableColumn<Row, Integer>("Percent");
     percentWeightCol.setCellValueFactory(new PropertyValueFactory<>("rowValue"));
+    TableColumn<Row, Integer> minWeightCol = new TableColumn<Row, Integer>("Min");
+    minWeightCol.setCellValueFactory(new PropertyValueFactory<>("min"));
+    TableColumn<Row, Integer> maxWeightCol = new TableColumn<Row, Integer>("Max");
+    maxWeightCol.setCellValueFactory(new PropertyValueFactory<>("max"));
+    TableColumn<Row, Integer> avgWeightCol = new TableColumn<Row, Integer>("Average");
+    avgWeightCol.setCellValueFactory(new PropertyValueFactory<>("avg"));
 
     table.setItems(list);
 
-    table.getColumns().add(monthCol);
-    table.getColumns().add(totalWeightCol);
-    table.getColumns().add(percentWeightCol);
+    table.getColumns().addAll(monthCol, totalWeightCol, percentWeightCol, minWeightCol, maxWeightCol, avgWeightCol);
   }
 
   private HBox buildTableID() {
@@ -158,7 +170,7 @@ public class FarmReport extends AssistantWindow {
     int year;
     String farm = farmSelect.getValue();
 
-    if (farm == null || farm.equals("")) {
+    if (farm == null) {
       loadMsg.set("Must choose a farm");
       return;
     }
@@ -166,18 +178,28 @@ public class FarmReport extends AssistantWindow {
     try {
       year = Integer.parseInt(yearSelect.getValue());
     } catch (NumberFormatException e) {
-      loadMsg.set("Year must be a positive integer");
+      loadMsg.set("Must select a year");
       return;
     }
     list.clear();
 
-    // Simulates loading data into list
+    // Loads the data for each month into a row
     for (Month m : MONTHS) {
+
       GregorianCalendar startDate = new GregorianCalendar(year, m.getValue() - 1, 1);
       GregorianCalendar endDate = (GregorianCalendar) startDate.clone();
       endDate.roll(Calendar.DAY_OF_MONTH, -1);
-      int total = Stats.sum(factory.getFarm(farm).forRange(startDate, endDate));
-      list.add(new Row(m.toString().substring(0, 3), total, 100 * total / factory.getTotal(startDate, endDate)));
+
+      List<Integer> range = factory.getFarm(farm).forRange(startDate, endDate);
+      int total = Stats.sum(range);
+      int min = Stats.min(range.stream().map(x -> x).collect(Collectors.toList()));
+      int max = Stats.max(range.stream().map(x -> x).collect(Collectors.toList()));
+      int avg = Stats.avg(range.stream().map(x -> x).collect(Collectors.toList()));
+
+      list.add(new Row(
+              m.toString().substring(0, 3),
+              total,
+              100 * total / factory.getTotal(startDate, endDate), min, max, avg));
     }
     table.refresh();
     loadMsg.set("Data loaded");
@@ -187,14 +209,14 @@ public class FarmReport extends AssistantWindow {
   }
 
   /**
-   * Show the window
+   * Method that will allow this scene to be displayed.
    *
    * @param stage   that the scene will be displayed to.
-   * @param factory the factory
+   * @param factory Reference to the CheeseFactory used by this program
    */
   @Override
-  public void showWindow(Stage stage, CheeseFactory factory) {
-    super.showWindow(stage, factory);
+  public void showWindow(Stage stage, CheeseFactory man) {
+    super.showWindow(stage, man);
     farmSelect.setItems(names);
     yearSelect.setItems(years);
   }

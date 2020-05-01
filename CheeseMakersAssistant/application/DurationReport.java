@@ -21,17 +21,14 @@ import java.util.stream.Collectors;
 
 
 /**
- * The duration report
+ * The break down farms over a length of time
  *
  * @authors Michael, Adam
  */
 public class DurationReport extends AssistantWindow {
 
-  Report report = Report.RANGE;
-
-  SimpleStringProperty loadMsg;
-  SimpleStringProperty tableTitle;
   private TableView<Row> table;
+
   private ObservableList<Row> list;
   private ChoiceBox<String> yearChoiceBox;
   private ChoiceBox<Month> monthChoiceBox;
@@ -39,7 +36,9 @@ public class DurationReport extends AssistantWindow {
   private ChoiceBox<Month> endMonthChoiceBox;
   private TextField dayStart;
   private TextField dayEnd;
-
+  private Report report = Report.RANGE;
+  private SimpleStringProperty loadMsg;
+  private SimpleStringProperty tableTitle;
   /**
    * Create duration report
    *
@@ -159,11 +158,37 @@ public class DurationReport extends AssistantWindow {
       fileChooser.setTitle("Save File");
       File file = fileChooser.showSaveDialog(stage);
       if (file != null) {
-        /*try {
-          factory.write(file); // FIX this
-        } catch (IOException e) {
-          e.printStackTrace();
-        }*/
+        try {
+          CSVWriter writer = new CSVWriter(file);
+          writer.writeRow(new String[]{
+                  "month",
+                  "weight",
+                  "percent",
+                  "min",
+                  "max",
+                  "avg"
+          });
+          for (Row row : list) {
+            writer.writeRow(new String[]{
+                    row.getRowName(),
+                    Integer.toString(row.getWeight()),
+                    Integer.toString(row.getRowValue()),
+                    Integer.toString(row.getMin()),
+                    Integer.toString(row.getMax()),
+                    Integer.toString(row.getAvg())
+            });
+          }
+          writer.close();
+          Alert a = new Alert(Alert.AlertType.INFORMATION);
+          a.setTitle("Save Complete");
+          a.setContentText("The file has been saved.");
+          a.show();
+        } catch (Exception e) {
+          Alert a = new Alert(Alert.AlertType.ERROR);
+          a.setTitle("Error while saving file");
+          a.setContentText(e.getMessage());
+          a.show();
+        }
       }
     });
 
@@ -178,7 +203,7 @@ public class DurationReport extends AssistantWindow {
   }
 
   /**
-   * Construct the table
+   * Method that will build the table for this window
    */
   private void buildTable() {
 
@@ -190,16 +215,20 @@ public class DurationReport extends AssistantWindow {
     totalWeightCol.setCellValueFactory(new PropertyValueFactory<>("weight"));
     TableColumn<Row, Integer> percentWeightCol = new TableColumn<Row, Integer>("Percent");
     percentWeightCol.setCellValueFactory(new PropertyValueFactory<>("rowValue"));
+    TableColumn<Row, Integer> minWeightCol = new TableColumn<Row, Integer>("Min");
+    minWeightCol.setCellValueFactory(new PropertyValueFactory<>("min"));
+    TableColumn<Row, Integer> maxWeightCol = new TableColumn<Row, Integer>("Max");
+    maxWeightCol.setCellValueFactory(new PropertyValueFactory<>("max"));
+    TableColumn<Row, Integer> avgWeightCol = new TableColumn<Row, Integer>("Average");
+    avgWeightCol.setCellValueFactory(new PropertyValueFactory<>("avg"));
 
-    table.getColumns().add(farmIdCol);
-    table.getColumns().add(totalWeightCol);
-    table.getColumns().add(percentWeightCol);
+    table.getColumns().addAll(farmIdCol, totalWeightCol, percentWeightCol, minWeightCol, maxWeightCol, avgWeightCol);
 
     table.setItems(list);
   }
 
   /**
-   * Load data into the table
+   * Method that will load the data of a requested report into the table
    */
   private void loadData() {
     int startYear = 0;
@@ -210,8 +239,11 @@ public class DurationReport extends AssistantWindow {
     Month endMonth = Month.DECEMBER;
     int startDay = 1;
     int endDay = 31;
+
     switch (report) {
       case RANGE:
+
+        //Ensures that the input years are selected and days are integers
         try {
           startYear = Integer.parseInt(yearChoiceBox.getValue());
           endYear = Integer.parseInt(endYearChoiceBox.getValue());
@@ -221,6 +253,8 @@ public class DurationReport extends AssistantWindow {
           loadMsg.set("Years and Days must be integers");
           return;
         }
+
+        //Checks if inputs months are selected
         startMonth = monthChoiceBox.getValue();
         endMonth = endMonthChoiceBox.getValue();
         if (endMonth == null || startMonth == null) {
@@ -230,6 +264,7 @@ public class DurationReport extends AssistantWindow {
         startDate = YearMonth.of(startYear, startMonth.getValue());
         endDate = YearMonth.of(endYear, endMonth.getValue());
 
+        //Checks if days are in a valid range
         if (startDay <= 0 || endDay <= 0) {
           loadMsg.set("Days must be positive integers");
           return;
@@ -249,6 +284,8 @@ public class DurationReport extends AssistantWindow {
           loadMsg.set("End date must not come before start date");
           return;
         }
+
+        //Checks if End date comes before Start date
         if (endYear == startYear) {
           if (endMonth.getValue() < startMonth.getValue()) {
             loadMsg.set("End date must not come before start date");
@@ -268,43 +305,65 @@ public class DurationReport extends AssistantWindow {
         break;
 
       case MONTH:
+
+        //Checks if year is selected
         try {
           startYear = Integer.parseInt(yearChoiceBox.getValue());
           endYear = startYear;
         } catch (NumberFormatException e) {
-          loadMsg.set("Year must be an integer");
+          loadMsg.set("Must select year");
           return;
         }
+
+        //Checks if month is selected
         startMonth = monthChoiceBox.getValue();
         if (startMonth == null) {
           loadMsg.set("Must select a month");
           return;
         }
+
         endMonth = startMonth;
         endDate = YearMonth.of(endYear, endMonth.getValue());
         endDay = endDate.lengthOfMonth();
+
         tableTitle.set("Monthly Report for " + startMonth + " " + startYear);
+
         break;
 
       case YEAR:
+
+        //Checks if year is selected
         try {
           startYear = Integer.parseInt(yearChoiceBox.getValue());
-          endYear = startYear + 1;
+          endYear = startYear;
         } catch (NumberFormatException e) {
-          loadMsg.set("Year must be a positive integer");
+          loadMsg.set("Must select a year");
           return;
         }
+
         tableTitle.set("Yearly Report for " + startYear);
     }
 
-    GregorianCalendar start = new GregorianCalendar(startYear, startMonth.getValue() - 1, startDay);
-    GregorianCalendar end = new GregorianCalendar(endYear, endMonth.getValue() - 1, endDay);
+    GregorianCalendar start = new GregorianCalendar(startYear,
+            startMonth.getValue() - 1,
+            startDay);
+
+    GregorianCalendar end = new GregorianCalendar(endYear,
+            endMonth.getValue() - 1,
+            endDay);
     list.clear();
     int total = factory.getTotal(start, end);
+
+    //Loads data for each farm in a row
     for (String s : names) {
-      int farmTotal = Stats.sum(factory.getFarm(s).forRange(start, end));
-      list.add(new Row(s, farmTotal, 100 * farmTotal / total));
+      List<Integer> range = factory.getFarm(s).forRange(start, end);
+      int farmTotal = Stats.sum(range);
+      int min = Stats.min(range.stream().map(x -> x).collect(Collectors.toList()));
+      int max = Stats.max(range.stream().map(x -> x).collect(Collectors.toList()));
+      int avg = Stats.avg(range.stream().map(x -> x).collect(Collectors.toList()));
+      list.add(new Row(s, farmTotal, 100 * farmTotal / total, min, max, avg));
     }
+
     loadMsg.set("Data loaded");
     List<Integer> weights = list.stream().map(x -> x.getWeight()).collect(Collectors.toList());
     String statsString = "Min: " + Stats.min(weights) + ", Avg: " + Stats.avg(weights) + ", Max: " + Stats.max(weights);
@@ -313,10 +372,10 @@ public class DurationReport extends AssistantWindow {
   }
 
   /**
-   * Show the window
+   * Method that will allow this window to be displayed.
    *
    * @param stage   that the scene will be displayed to.
-   * @param factory the factory
+   * @param factory Reference to the CheeseFactory used by this program
    */
   @Override
   public void showWindow(Stage stage, CheeseFactory factory) {
